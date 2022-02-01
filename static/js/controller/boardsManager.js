@@ -31,3 +31,17 @@ function showHideButtonHandler(clickEvent) {
 
   cardsManager.loadCards(boardId);
 }
+
+const showCards = async (boardId) => {
+  let statuses = await boardsManager.loadStatuses();
+  for (let status of statuses) {
+    const statusBuilder = htmlFactory(htmlTemplates.status);
+    const content = statusBuilder(status, boardId);
+    domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
+  }
+}
+
+const hideCards = async (boardId) => {
+  const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+  statusContainer.innerHTML = "";
+}
