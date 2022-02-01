@@ -19,17 +19,16 @@ export let boardsManager = {
   },
 };
 
-function showHideButtonHandler(clickEvent) {
-  console.log(clickEvent.target.dataset.boardId)
-  console.log(clickEvent.target.dataset)
-  console.log(clickEvent.target)
+async function showHideButtonHandler(clickEvent) {
   const boardId = clickEvent.target.dataset.boardId;
-  // let statuses = boardsManager.loadStatuses();
-  // for (let status of statuses) {
-  //
-  // }
-
-  cardsManager.loadCards(boardId);
+  const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+  columContainer.classList.toggle("show");
+  if (columContainer.classList.contains("show")) {
+    await showCards(boardId);
+    await cardsManager.loadCards(boardId);
+  } else {
+    await hideCards(boardId);
+  }
 }
 
 const showCards = async (boardId) => {

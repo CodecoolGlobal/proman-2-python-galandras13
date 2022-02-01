@@ -54,9 +54,16 @@ function cardBuilder(card) {
     return `<div class="card" data-card-id="${card.id}">${card.title}</div>`;
 }
 
-function statusBuilder(status) {
-    return`<div class="status">
-            
-
-            </div>`
+function statusBuilder(status, boardId){
+    return`<div class="board-column">
+                <div class="board-column-title">${status.title}</div>
+                <div class="board-column-content" data-status-id="${status.id}" data-board-id="${boardId}">
+                </div>
+           </div>`
 }
+
+// <div class="board-column">
+//     <div class="board-column-title">New</div>
+//     <div class="board-column-content">
+//     </div>
+// </div>
