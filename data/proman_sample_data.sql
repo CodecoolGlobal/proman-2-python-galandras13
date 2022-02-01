@@ -43,6 +43,12 @@ CREATE TABLE cards (
     card_order  INTEGER             NOT NULL
 );
 
+CREATE TABLE users (
+    id          INTEGER             NOT NULL,
+    username    VARCHAR(200)        NOT NULL,
+    password    text
+);
+
 ---
 --- insert data
 ---

@@ -1,8 +1,8 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, redirect, session
 from dotenv import load_dotenv
 
 
-from util import json_response
+from util import json_response, hash_password, check_password
 import mimetypes
 import queires
 
@@ -60,6 +60,43 @@ def get_status_by_status_id(status_id):
 @json_response
 def get_card(card_id):
     return queires.get_card_by_id(card_id)
+
+
+@app.route('/registration', methods=['GET', 'POST'])
+def registration():
+    error_message = ''
+    if request.method == 'POST':
+        username = dict(request.form)['username']
+        password = dict(request.form)['password']
+        if queires.get_user(username):
+            error_message = "Username already in use."
+            return render_template('registration.html', message=error_message)
+        else:
+            queires.create_user(username, hash_password(password))
+            return redirect(url_for('index'))
+    return render_template('registration.html', message=error_message)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error_message = ''
+    if request.method == 'POST':
+        username = dict(request.form)['username']
+        password = dict(request.form)['password']
+        user = queires.get_user(username)
+        if user:
+            if check_password(password, user['password']):
+                session['username'] = username
+                session['id'] = user['id']
+                return redirect(url_for('index'))
+        error_message = 'Invalid credentials.'
+    return render_template('login.html', message=error_message)
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
 
 
 def main():

@@ -81,5 +81,22 @@ def get_card_by_id(card_id):
     return data_manager.execute_select(
         """
         SELECT * FROM cards
-        WHERE id = %(card_id)s""", {'card_id': card_id}, fetchall=False
-    )
+        WHERE id = %(card_id)s""", {'card_id': card_id}, fetchall=False)
+
+
+def create_user(username, password):
+    data_manager.execute_select(
+        """
+        INSERT INTO users(username, password)
+        VALUES (%(username)s, %(password)s)
+        """, {'username': username, "password": password}, select=False)
+
+
+def get_user(username):
+    result = data_manager.execute_select(
+        """
+        SELECT *
+        FROM users
+        WHERE username = %(username)s;
+        """, {"username": username}, fetchall=False)
+    return result
