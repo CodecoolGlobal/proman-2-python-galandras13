@@ -10,6 +10,7 @@ mimetypes.add_type('application/javascript', '.js')
 app = Flask(__name__)
 load_dotenv()
 
+
 @app.route("/")
 def index():
     """
@@ -27,6 +28,12 @@ def get_boards():
     return queires.get_boards()
 
 
+@app.route("/api/boards/<board_id>")
+@json_response
+def get_board(board_id):
+    return queires.get_board_by_id(board_id)
+
+
 @app.route("/api/boards/<int:board_id>/cards/")
 @json_response
 def get_cards_for_board(board_id: int):
@@ -35,6 +42,24 @@ def get_cards_for_board(board_id: int):
     :param board_id: id of the parent board
     """
     return queires.get_cards_for_board(board_id)
+
+
+@app.route("/api/statuses/")
+@json_response
+def get_statuses():
+    return queires.get_statuses()
+
+
+@app.route("/api/statuses/<status_id>")
+@json_response
+def get_status_by_status_id(status_id):
+    return queires.get_status_by_status_id(status_id)
+
+
+@app.route("/api/cards/<int:card_id>")
+@json_response
+def get_card(card_id):
+    return queires.get_card_by_id(card_id)
 
 
 def main():

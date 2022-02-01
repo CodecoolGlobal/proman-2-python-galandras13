@@ -47,3 +47,39 @@ def get_cards_for_board(board_id):
         , {"board_id": board_id})
 
     return matching_cards
+
+
+def get_board_by_id(board_id):
+    return data_manager.execute_select(
+        """
+        SELECT * FROM boards
+        WHERE boards.id = %(board_id)s
+        """, {'board_id': board_id}, fetchall=False
+    )
+
+
+def get_statuses():
+    return data_manager.execute_select(
+        """
+        SELECT id, title FROM statuses
+        ;
+        """
+    )
+
+
+def get_status_by_status_id(status_id):
+    return data_manager.execute_select(
+        """
+        SELECT id, title FROM statuses
+        WHERE id = %(status_id)s
+        ;
+        """, {"status_id": status_id}, fetchall=False
+    )
+
+
+def get_card_by_id(card_id):
+    return data_manager.execute_select(
+        """
+        SELECT * FROM cards
+        WHERE id = %(card_id)s""", {'card_id': card_id}, fetchall=False
+    )

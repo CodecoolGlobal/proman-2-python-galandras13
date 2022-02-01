@@ -5,12 +5,18 @@ export let dataHandler = {
   },
   getBoard: async function (boardId) {
     // the board is retrieved and then the callback function is called with the board
+    const response = await apiGet(`/api/boards/${boardId}`);
+    return response;
   },
   getStatuses: async function () {
     // the statuses are retrieved and then the callback function is called with the statuses
+    const response = await apiGet("/api/statuses/");
+    return response;
   },
   getStatus: async function (statusId) {
     // the status is retrieved and then the callback function is called with the status
+    const response = await apiGet(`/api/statuses/${statusId}`);
+    return response;
   },
   getCardsByBoardId: async function (boardId) {
     const response = await apiGet(`/api/boards/${boardId}/cards/`);
@@ -18,6 +24,8 @@ export let dataHandler = {
   },
   getCard: async function (cardId) {
     // the card is retrieved and then the callback function is called with the card
+    const response = await apiGet(`/api/cards/${cardId}`);
+    return response;
   },
   createNewBoard: async function (boardTitle) {
     // creates new board, saves it and calls the callback function with its data
