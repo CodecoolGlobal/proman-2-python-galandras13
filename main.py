@@ -72,7 +72,7 @@ def create_board():
     return redirect("/")
 
 
-@app.route("/api/modifiedBoards/<board_id>")
+@app.route("/api/modifiedBoards/<board_id>", methods=['PUT'])
 def update_board(board_id):
     request_json = request.get_json()
     modified_name = request_json["new_title"]
