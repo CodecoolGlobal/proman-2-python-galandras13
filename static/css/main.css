@@ -189,3 +189,7 @@ section.board{
     height: 50px;
 }
 /*NAVBAR*/
+
+.rotate {
+    transform: rotate(180deg);
+}

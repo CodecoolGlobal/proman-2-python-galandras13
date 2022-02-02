@@ -23,6 +23,7 @@ async function showHideButtonHandler(clickEvent) {
   const boardId = clickEvent.target.dataset.boardId;
   const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
   columContainer.classList.toggle("show");
+  clickEvent.target.classList.toggle("rotate");
   if (columContainer.classList.contains("show")) {
     await showCards(boardId);
     await cardsManager.loadCards(boardId);
