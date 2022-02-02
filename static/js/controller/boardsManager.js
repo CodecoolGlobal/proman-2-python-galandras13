@@ -1,7 +1,8 @@
 import {dataHandler} from "../data/dataHandler.js";
-import {htmlFactory, htmlTemplates} from "../view/htmlFactory.js";
+import {createNewBoardTitle, htmlFactory, htmlTemplates} from "../view/htmlFactory.js";
 import {domManager} from "../view/domManager.js";
 import {cardsManager} from "./cardsManager.js";
+import {reset} from "../main";
 
 export let boardsManager = {
   loadBoards: async function () {
@@ -10,8 +11,8 @@ export let boardsManager = {
       const boardBuilder = htmlFactory(htmlTemplates.board);
       const content = boardBuilder(board);
       domManager.addChild("#root", content);
-      domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`,
-          "click", showHideButtonHandler);
+      domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
+      domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
     }
   },
   loadStatuses: async function (){
@@ -44,3 +45,16 @@ const hideCards = async (boardId) => {
   const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
   statusContainer.innerHTML = "";
 }
+
+function renameTable(boardId) {
+  const rename = document.querySelector(`#board-title-${boardId}`)
+  rename.innerHTML = createNewBoardTitle(boardId)
+  // const boardId = clickEvent.target.dataset.boardId;
+  // clickEvent.target.innerHTML = createNewBoardTitle(boardId);
+  domManager.addEventListener(`#submit-new-board-title-${boardId}`, 'click', async  () => {
+    const updatedBoardTitle = document.querySelector(`#new-board-title-${boardId}`).value
+    await dataHandler.updateBoardTitle(boardId, updatedBoardTitle)
+    await reset()
+  })
+}
+

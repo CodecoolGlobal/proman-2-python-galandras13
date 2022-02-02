@@ -100,3 +100,45 @@ def get_user(username):
         WHERE username = %(username)s;
         """, {"username": username}, fetchall=False)
     return result
+
+
+def create_board(title, user_id=None):
+    if user_id:
+        board_id = data_manager.execute_select(
+            """
+            INSERT INTO boards(id, title, user_id)
+            VALUES (default, %(title)s, %(user_id)s)
+            RETURNING id;
+            """, {"title": title, "user_id": user_id}, fetchall=False)['id']
+    else:
+        board_id = data_manager.execute_select(
+            """
+            INSERT INTO boards(id, title)
+            VALUES (default, %(title)s)
+            RETURNING id;
+            """, {"title": title}, fetchall=False)['id']
+    init_statuses(board_id)
+
+
+def modify_board_title(board_id, modified_name):
+    data_manager.execute_select(
+        """
+        UPDATE boards
+        SET title = %(modified_name)s
+        WHERE id = %(board_id)s
+        """, {"modified_name": modified_name, "board_id": board_id}, select=False)
+
+
+def init_statuses(board_id):
+    default_statuses = ['new', 'in progress', 'testing', 'done']
+    for i in range(4):
+        create_status(default_statuses[i], board_id)
+
+
+def create_status(title, board_id):
+    data_manager.execute_select(
+        """
+        INSERT INTO statuses(title, board_id)
+        VALUES (%(title)s, %(board_id)s)
+        """, {'title': title, 'board_id': board_id}, select=False
+    )
