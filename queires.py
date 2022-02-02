@@ -61,7 +61,7 @@ def get_board_by_id(board_id):
 def get_statuses():
     return data_manager.execute_select(
         """
-        SELECT id, title FROM statuses
+        SELECT id, title, board_id FROM statuses
         ;
         """
     )

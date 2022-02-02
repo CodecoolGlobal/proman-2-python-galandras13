@@ -35,9 +35,11 @@ async function showHideButtonHandler(clickEvent) {
 const showCards = async (boardId) => {
   let statuses = await boardsManager.loadStatuses();
   for (let status of statuses) {
-    const statusBuilder = htmlFactory(htmlTemplates.status);
-    const content = statusBuilder(status, boardId);
-    domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
+    if (status.board_id === boardId) {
+      const statusBuilder = htmlFactory(htmlTemplates.status);
+      const content = statusBuilder(status, boardId);
+      domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
+    }
   }
 }
 
