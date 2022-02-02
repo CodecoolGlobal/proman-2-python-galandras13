@@ -4,6 +4,10 @@ import bcrypt
 from flask import jsonify
 
 
+def jsonify_dict(var):
+    return jsonify(var)
+
+
 def json_response(func):
     """
     Converts the returned dictionary into a JSON response

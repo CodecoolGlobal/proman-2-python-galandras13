@@ -42,6 +42,9 @@ export let dataHandler = {
   createNewCard: async function (cardTitle, boardId, statusId) {
     // creates new card, saves it and calls the callback function with its data
   },
+  updateCards: function (payload) {
+    apiPost(`/api/update/card`, payload);
+  }
 };
 
 async function apiGet(url) {
@@ -61,7 +64,8 @@ async function apiPost(url, payload) {
       'Content-Type': 'application/json'},
       method: 'POST',
       body: JSON.stringify(payload)
-  })
+  });
+
 }
 
 async function apiDelete(url, payload="") {

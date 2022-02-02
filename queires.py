@@ -102,6 +102,18 @@ def get_user(username):
     return result
 
 
+
+def update_card_by_card_id(card_id, card_order, status_id):
+    data_manager.execute_update(
+        """
+        UPDATE cards
+        SET 
+        card_order = %(card_order)s,
+        status_id = %(status_id)s
+        WHERE id = %(card_id)s
+        """, {'card_id': card_id, 'card_order': card_order, 'status_id': status_id})
+
+
 def create_board(title, user_id=None):
     if user_id:
         board_id = data_manager.execute_select(

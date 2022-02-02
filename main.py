@@ -1,8 +1,7 @@
 from flask import Flask, render_template, url_for, request, redirect, session
 from dotenv import load_dotenv
 
-
-from util import json_response, hash_password, check_password
+from util import json_response, hash_password, check_password, jsonify_dict
 import mimetypes
 import queires
 
@@ -120,6 +119,16 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("index"))
+
+
+@app.route('/api/update/card', methods=["POST"])
+def update_cards_by_card_id():
+    card_id = request.json['card_id']
+    card_order = request.json['card_order']
+    status_id = request.json['status_id']
+    if queires.update_card_by_card_id(card_id, card_order, status_id):
+        return jsonify_dict({'message': f" Successfully updated card with id:{card_id}."})
+    return jsonify_dict({'message': f" Failed to update card with id:{card_id}."})
 
 
 def main():
