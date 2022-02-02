@@ -27,6 +27,7 @@ async function showHideButtonHandler(clickEvent) {
   if (columContainer.classList.contains("show")) {
     await showCards(boardId);
     await cardsManager.loadCards(boardId);
+    await cardsManager.initDragAndDrop(boardId);
   } else {
     await hideCards(boardId);
   }
