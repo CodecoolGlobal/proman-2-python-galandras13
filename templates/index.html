@@ -20,6 +20,19 @@
         <script type="module" src="{{ url_for('static', filename='js/main.js') }}" defer></script>
     </head>
     <body>
-        <div id="root"></div>
+    <div class="navbar-container">
+        <nav class="navMenu">
+            <img class="image" src="{{ url_for('static', filename='/img/codecool-logo.png') }}" alt="logo" draggable="false">
+            {% if not session.username %}
+                <a id="registration" href="/registration">Register</a>
+                <a id="login" href="/login">Login</a>
+            {% else %}
+                <span id="welcome">Welcome, {{ session.username }}.</span>
+                <a id="logout" href="/logout">Logout</a>
+            {% endif %}
+            <div class="dot"></div>
+        </nav>
+    </div>
+    <div id="root"></div>
     </body>
 </html>

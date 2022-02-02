@@ -45,7 +45,7 @@ CREATE TABLE cards (
 );
 
 CREATE TABLE users (
-    id          INTEGER             NOT NULL,
+    id          SERIAL PRIMARY KEY  NOT NULL,
     username    VARCHAR(200)        NOT NULL,
     password    text
 );

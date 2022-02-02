@@ -9,6 +9,7 @@ import queires
 mimetypes.add_type('application/javascript', '.js')
 app = Flask(__name__)
 load_dotenv()
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 @app.route("/")
@@ -66,8 +67,8 @@ def get_card(card_id):
 def registration():
     error_message = ''
     if request.method == 'POST':
-        username = dict(request.form)['username']
-        password = dict(request.form)['password']
+        username = request.form['username']
+        password = request.form['password']
         if queires.get_user(username):
             error_message = "Username already in use."
             return render_template('registration.html', message=error_message)
