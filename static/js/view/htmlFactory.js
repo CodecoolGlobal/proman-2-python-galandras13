@@ -31,6 +31,23 @@ function boardBuilder(board) {
             </section>`
 }
 
+
+export function createNewBoardTitle(boardId = '') {
+    console.log('asd');
+    boardId = boardId ? `-${boardId}`: ""
+    return `<input type="text" 
+                    placeholder="Board Title" 
+                    id="new-board-title${boardId}" >
+            <input type="checkbox" value="true" id="private-checkbox${boardId}">
+            <label for="private-checkbox${boardId}">Private</label>
+           <button id="submit-new-board-title${boardId}">Submit</button>`
+}
+
+
+export function createNewBoard() {
+    return `<button type="button" id="new-board">Submit new board</button>`
+}
+
 //-------------OG--------------------------->
 // `<div class="board-container">
 //                 <div class="board"  data-board-id=${board.id}>${board.title}</div>
