@@ -62,6 +62,28 @@ def get_card(card_id):
     return queires.get_card_by_id(card_id)
 
 
+@app.route("/api/newBoards", methods=['POST'])
+def create_board():
+    board_title = request.get_json()["board_title"]
+    private = request.get_json()["private"]
+    user_id = session.get("id", None) if private else None
+    queires.create_board(board_title, user_id)
+    return redirect("/")
+
+
+@app.route("/api/modifiedBoards/<board_id>")
+def update_board(board_id):
+    request_json = request.get_json()
+    modified_name = request_json["new_title"]
+    queires.modify_board_title(board_id, modified_name)
+    return redirect("/")
+
+
+# @app.route("/api/boards/<board_id>", methods=['DELETE'])
+# def delete_board():
+#
+
+
 @app.route('/registration', methods=['GET', 'POST'])
 def registration():
     error_message = ''
