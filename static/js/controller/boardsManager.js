@@ -12,6 +12,7 @@ export let boardsManager = {
       const content = boardBuilder(board);
       domManager.addChild("#root", content);
       domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
+      domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
       domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
     }
   },
@@ -23,8 +24,9 @@ export let boardsManager = {
 async function showHideButtonHandler(clickEvent) {
   const boardId = clickEvent.target.dataset.boardId;
   const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+  const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
+  button.classList.toggle("rotate");
   columContainer.classList.toggle("show");
-  clickEvent.target.classList.toggle("rotate");
   if (columContainer.classList.contains("show")) {
     await showCards(boardId);
     await cardsManager.loadCards(boardId);
