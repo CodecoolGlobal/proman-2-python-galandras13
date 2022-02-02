@@ -2,7 +2,7 @@ import {dataHandler} from "../data/dataHandler.js";
 import {createNewBoardTitle, htmlFactory, htmlTemplates} from "../view/htmlFactory.js";
 import {domManager} from "../view/domManager.js";
 import {cardsManager} from "./cardsManager.js";
-import {reset} from "../main";
+import {reset} from "../main.js";
 
 export let boardsManager = {
   loadBoards: async function () {
@@ -12,6 +12,7 @@ export let boardsManager = {
       const content = boardBuilder(board);
       domManager.addChild("#root", content);
       domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
+      domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
       domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
     }
   },
@@ -23,8 +24,9 @@ export let boardsManager = {
 async function showHideButtonHandler(clickEvent) {
   const boardId = clickEvent.target.dataset.boardId;
   const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+  const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
+  button.classList.toggle("rotate");
   columContainer.classList.toggle("show");
-  clickEvent.target.classList.toggle("rotate");
   if (columContainer.classList.contains("show")) {
     await showCards(boardId);
     await cardsManager.loadCards(boardId);
@@ -37,7 +39,7 @@ async function showHideButtonHandler(clickEvent) {
 const showCards = async (boardId) => {
   let statuses = await boardsManager.loadStatuses();
   for (let status of statuses) {
-    if (status.board_id === boardId) {
+    if (status.board_id === parseInt(boardId)) {
       const statusBuilder = htmlFactory(htmlTemplates.status);
       const content = statusBuilder(status, boardId);
       domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
@@ -50,8 +52,11 @@ const hideCards = async (boardId) => {
   statusContainer.innerHTML = "";
 }
 
-function renameTable(boardId) {
-  const rename = document.querySelector(`#board-title-${boardId}`)
+function renameTable(clickEvent) {
+  console.log('asd');
+  const boardId = clickEvent.target.dataset.boardId;
+  const selectorString = `.board-title[data-board-id="${boardId}"]`
+  const rename = document.querySelector(selectorString)
   rename.innerHTML = createNewBoardTitle(boardId)
   // const boardId = clickEvent.target.dataset.boardId;
   // clickEvent.target.innerHTML = createNewBoardTitle(boardId);

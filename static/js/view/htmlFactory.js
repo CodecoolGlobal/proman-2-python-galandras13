@@ -38,8 +38,6 @@ export function createNewBoardTitle(boardId = '') {
     return `<input type="text" 
                     placeholder="Board Title" 
                     id="new-board-title${boardId}" >
-            <input type="checkbox" value="true" id="private-checkbox${boardId}">
-            <label for="private-checkbox${boardId}">Private</label>
            <button id="submit-new-board-title${boardId}">Submit</button>`
 }
 
