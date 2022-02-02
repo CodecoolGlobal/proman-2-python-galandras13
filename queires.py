@@ -87,8 +87,8 @@ def get_card_by_id(card_id):
 def create_user(username, password):
     data_manager.execute_select(
         """
-        INSERT INTO users(username, password)
-        VALUES (%(username)s, %(password)s)
+        INSERT INTO users(id, username, password)
+        VALUES (default, %(username)s, %(password)s)
         """, {'username': username, "password": password}, select=False)
 
 
