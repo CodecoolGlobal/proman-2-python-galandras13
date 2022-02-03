@@ -56,6 +56,11 @@ export let dataHandler = {
   createNewCard: async function (boardId, newCardName) {
     const payload = {"new_card_name": newCardName};
     await apiPost(`/api/${boardId}/create-card`, payload)
+  },
+  renameCard: async function(cardId, modifiedTitle=null) {
+    const payload = modifiedTitle ? {"modified_title": modifiedTitle} : {}
+    await apiPut(`/api/cards/${cardId}`, payload)
+
   }
 };
 

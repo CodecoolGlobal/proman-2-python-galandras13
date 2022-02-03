@@ -49,8 +49,15 @@ export function createNewBoardTitle(boardId = '') {
     boardId = boardId ? `-${boardId}` : ""
     return `<input type="text" 
                     placeholder="Board Title" 
-                    id="new-board-title${boardId}" >
+                    id="new-board-title${boardId}">
            <button id="submit-new-board-title${boardId}">Submit</button>`
+}
+
+export function newCardTitle(boardId = "") {
+    return `<input type="text" 
+                    placeholder="Enter new card title" 
+                    id="new-card-title-${boardId}">
+            <button id="submit-new-card-${boardId}" data-board-id="${boardId}">Submit</button>`
 }
 
 export function createNewBoard() {
@@ -60,7 +67,7 @@ export function createNewBoard() {
 
 function cardBuilder(card) {
     return `<div class="card" data-card-id="${card.id}" data-board-id="${card.board_id}">
-                <div class="card-title"><span>${card.title}</span></div>
+                <div class="card-title"  data-card-id="${card.id}" data-board-id="${card.board_id}"><span class="card" data-card-id="${card.id}" data-board-id="${card.board_id}">${card.title}</span></div>
                 <div class="card-remove" data-card-id="${card.id}" data-board-id="${card.board_id}"><i class="fas fa-trash-alt"></i></div>
             </div>`;
 }

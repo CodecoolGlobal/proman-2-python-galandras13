@@ -192,6 +192,15 @@ def delete_column_cards(board_id, status_id):
         """, {"board_id": board_id, "status_id": status_id}, select=False)
 
 
+def rename_card(card_id, modified_title):
+    return data_manager.execute_select(
+        """
+        UPDATE cards
+        SET title = %(modified_title)s
+        WHERE id = %(card_id)s
+        """, {"modified_title": modified_title, "card_id": card_id}, select=False)
+
+
 def create_card(new_card_name, board_id, status_id, card_order):
     data_manager.execute_select(
         """

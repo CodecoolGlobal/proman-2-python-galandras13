@@ -146,6 +146,14 @@ def update_cards_by_card_id():
     return jsonify_dict({'message': f" Failed to update card with id:{card_id}."})
 
 
+@app.route('/api/cards/<card_id>', methods=['PUT'])
+def rename_card(card_id):
+    data = request.get_json()
+    modified_title = data['modified_title']
+    queires.rename_card(card_id, modified_title)
+    return "", 204
+
+
 @app.route('/api/cards/<card_id>', methods=['DELETE'])
 def delete_card(card_id):
     queires.delete_card(card_id)

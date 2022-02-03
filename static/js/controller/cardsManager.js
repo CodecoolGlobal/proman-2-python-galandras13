@@ -1,5 +1,5 @@
 import {dataHandler} from "../data/dataHandler.js";
-import {htmlFactory, htmlTemplates} from "../view/htmlFactory.js";
+import {createNewBoardTitle, htmlFactory, htmlTemplates, newCardTitle} from "../view/htmlFactory.js";
 import {domManager} from "../view/domManager.js";
 import {reset} from "../main.js";
 import {boardsManager} from "./boardsManager.js";
@@ -22,12 +22,30 @@ export let cardsManager = {
             const content = cardBuilder(card);
             domManager.addChild(`.board-column-content[data-status-id="${card.status_id}"][data-board-id="${boardId}"]`, content);
             domManager.addEventListener(`.card-remove[data-card-id="${card.id}"]`, "click", deleteButtonHandler);
+            domManager.addEventListener(`.card[data-card-id="${card.id}"][data-board-id="${card.board_id}"]`, "click", renameCard)
         }
     }, initDragAndDrop: async function (boardId) {
         await initElements(boardId);
         await initDragEvents();
-    },
+    }
 };
+
+function renameCard(clickEvent) {
+    const cardId = clickEvent.target.dataset.cardId;
+    const boardId = clickEvent.target.dataset.boardId;
+    const selectorString = `.card[data-card-id="${cardId}"]`
+    const rename = document.querySelector(selectorString)
+    rename.innerHTML = newCardTitle(boardId)
+    domManager.addEventListener(`#submit-new-card-${boardId}`, 'click', async () => {
+        const modifiedTitle = document.querySelector(`#new-card-title-${boardId}`).value;
+        await dataHandler.renameCard(cardId, modifiedTitle);
+        await boardsManager.hideCards(boardId);
+        await boardsManager.showCards(boardId);
+        await cardsManager.loadCards(boardId);
+        await cardsManager.initDragAndDrop(boardId);
+    })
+}
+
 
 function sortByCardOrder( a, b ) {
   if ( a.card_order < b.card_order ){
