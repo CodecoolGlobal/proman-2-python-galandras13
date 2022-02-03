@@ -137,6 +137,12 @@ def delete_card(card_id):
     return "#"
 
 
+@app.route('/api/boards/<board_id>', methods=['DELETE'])
+def delete_board(board_id):
+    queires.delete_board(board_id)
+    return redirect('/')
+
+
 @app.route('/api/add-new-column', methods=["POST"])
 def add_new_column():
     board_id = request.json['board_id']
