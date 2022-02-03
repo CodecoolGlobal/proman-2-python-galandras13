@@ -89,7 +89,6 @@ function handleDragEnd() {
                 'card_order': cardOrder,
                 'status_id': statusId
             };
-            console.log("saving!")
             dataHandler.updateCards(payload);
         }
     }
