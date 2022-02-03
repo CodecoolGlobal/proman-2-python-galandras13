@@ -190,3 +190,13 @@ def delete_column_cards(board_id, status_id):
         FROM cards
         WHERE board_id = %(board_id)s AND status_id = %(status_id)s
         """, {"board_id": board_id, "status_id": status_id}, select=False)
+
+
+def rename_card(card_id, modified_title):
+    return data_manager.execute_select(
+        """
+        UPDATE cards
+        SET title = %(modified_title)s
+        WHERE id = %(card_id)s
+        """, {"modified_title": modified_title, "card_id": card_id}, select=False)
+
