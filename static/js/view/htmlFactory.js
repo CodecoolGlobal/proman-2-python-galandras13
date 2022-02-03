@@ -26,9 +26,7 @@ export function htmlFactory(template) {
             return createNewCardInputBuilder;
         default:
             console.error("Undefined template: " + template)
-            return () => {
-                return ""
-            }
+            return () => { return "" }
     }
 }
 
@@ -67,9 +65,11 @@ function cardBuilder(card) {
             </div>`;
 }
 
-function statusBuilder(status, boardId) {
-    return `<div class="board-column">
-                <div class="board-column-title">${status.title}</div>
+function statusBuilder(status, boardId){
+    return`<div class="board-column">
+                <div class="board-column-title"><span>${status.title}</span>
+                <span class="delete-column-button"><i class="fas fa-trash-alt pointer" id="delete-column-button-${boardId}-${status.id}" data-board-id=${boardId} data-status-id=${status.id}></i></span>
+                </div>
                 <div class="board-column-content" data-status-id="${status.id}" data-board-id="${boardId}">
                 </div>
            </div>`

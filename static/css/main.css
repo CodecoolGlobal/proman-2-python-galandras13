@@ -258,6 +258,10 @@ section.board {
     display: none;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 .add-card-button-container{
     margin-left: 5rem;
 }

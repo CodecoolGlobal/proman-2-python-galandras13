@@ -50,11 +50,13 @@ export let dataHandler = {
   deleteCard: async function (cardId) {
     await apiDelete(`/api/cards/${cardId}`);
   },
+  deleteColumn: async function(boardId, statusId) {
+    await apiDelete(`/api/columns/${boardId}/${statusId}`);
+  },
   createNewCard: async function (boardId, newCardName) {
     const payload = {"new_card_name": newCardName};
     await apiPost(`/api/${boardId}/create-card`, payload)
   }
-
 };
 
 async function apiGet(url) {

@@ -165,6 +165,33 @@ def delete_card(card_id):
         """, {"card_id": card_id}, select=False)
 
 
+def delete_board(board_id):
+    data_manager.execute_select(
+        """
+        DELETE
+        FROM boards
+        WHERE id = %(board_id)s;
+        """, {"board_id": board_id}, select=False)
+
+
+def delete_columns(status_id):
+    data_manager.execute_select(
+        """
+        DELETE
+        FROM statuses
+        WHERE id = %(id)s
+        """, {"id": status_id}, select=False)
+
+
+def delete_column_cards(board_id, status_id):
+    data_manager.execute_select(
+        """
+        DELETE
+        FROM cards
+        WHERE board_id = %(board_id)s AND status_id = %(status_id)s
+        """, {"board_id": board_id, "status_id": status_id}, select=False)
+
+
 def create_card(new_card_name, board_id, status_id, card_order):
     data_manager.execute_select(
         """

@@ -149,7 +149,20 @@ def update_cards_by_card_id():
 @app.route('/api/cards/<card_id>', methods=['DELETE'])
 def delete_card(card_id):
     queires.delete_card(card_id)
-    return "#"
+    return "", 204
+
+
+@app.route('/api/boards/<board_id>', methods=['DELETE'])
+def delete_board(board_id):
+    queires.delete_board(board_id)
+    return "", 204
+
+
+@app.route('/api/columns/<board_id>/<status_id>', methods=['DELETE'])
+def delete_column(board_id, status_id):
+    queires.delete_columns(status_id)
+    queires.delete_column_cards(board_id, status_id)
+    return "", 204
 
 
 @app.route('/api/add-new-column', methods=["POST"])
