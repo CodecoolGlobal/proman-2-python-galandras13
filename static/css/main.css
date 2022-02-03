@@ -151,6 +151,8 @@ section.board {
     height: 100%;
     overflow-x: hidden;
     transition: 0.3s;
+    display: flex;
+    align-items: end;
 }
 
 .navMenu a {
@@ -226,3 +228,11 @@ section.board {
     display: flex;
 }
 
+#add-new-board {
+    text-align: end;
+    width: 100%;
+}
+
+.hidden {
+    display: none;
+}
