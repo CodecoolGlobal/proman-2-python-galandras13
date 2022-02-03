@@ -190,3 +190,37 @@ def delete_column_cards(board_id, status_id):
         FROM cards
         WHERE board_id = %(board_id)s AND status_id = %(status_id)s
         """, {"board_id": board_id, "status_id": status_id}, select=False)
+
+
+def create_card(new_card_name, board_id, status_id, card_order):
+    data_manager.execute_select(
+        """
+    INSERT INTO cards(board_id, status_id, title, card_order)
+    VALUES (%(board_id)s, %(status_id)s, %(new_card_name)s, %(card_order)s)
+    """, {'new_card_name': new_card_name,
+          'board_id': board_id,
+          'status_id': status_id,
+          'card_order': card_order}, select=False
+    )
+
+
+def get_first_status_by_board_id(board_id):
+    return data_manager.execute_select(
+        """
+    SELECT id 
+    FROM statuses
+    WHERE board_id = %(board_id)s
+    ORDER BY id
+    LIMIT 1;
+    """, {'board_id': board_id}, fetchall=False
+    )
+
+
+def get_card_order_by_status_id(status_id):
+    return data_manager.execute_select(
+        """
+            SELECT MAX(card_order) AS card_order
+            FROM cards
+            WHERE status_id = %(status_id)s;
+            """, {'status_id': status_id}, fetchall=False
+    )

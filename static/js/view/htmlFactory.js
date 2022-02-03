@@ -3,21 +3,27 @@ export const htmlTemplates = {
     card: 2,
     status: 3,
     addStatusButton: 4,
-    addModal: 5
+    addModal: 5,
+    addCreateCardButton: 6,
+    createNewCard: 7,
 }
 
 export function htmlFactory(template) {
     switch (template) {
         case htmlTemplates.board:
-            return boardBuilder
+            return boardBuilder;
         case htmlTemplates.card:
-            return cardBuilder
+            return cardBuilder;
         case htmlTemplates.status:
-            return statusBuilder
+            return statusBuilder;
         case htmlTemplates.addStatusButton:
-            return addStatusBuilder
+            return addStatusBuilder;
         case htmlTemplates.addModal:
-            return addModalBuilder
+            return addModalBuilder;
+        case htmlTemplates.addCreateCardButton:
+            return addCreateCardBuilder;
+        case htmlTemplates.createNewCard:
+            return createNewCardInputBuilder;
         default:
             console.error("Undefined template: " + template)
             return () => { return "" }
@@ -28,11 +34,11 @@ function boardBuilder(board) {
     return `<section class="board" data-board-id="${board.id}">
                 <div class="board-header" data-board-id="${board.id}">
                     <span class="board-title" data-board-id="${board.id}">${board.title}</span>
-                    <button class="board-add" data-board-id="${board.id}">Add Card</button>
-                    <button class="toggle-board-button" data-board-id="${board.id}">
-                        <i class="fas fa-chevron-down" data-board-id="${board.id}"></i>
-                    </button>
                     <button class="board-delete" data-board-id="${board.id}">X</button>
+                    <span Class="add-card-button-container${board.id}"></span>
+                    <span class="toggle-board-button-container"><button class="toggle-board-button" data-board-id="${board.id}">
+                        <i class="fas fa-chevron-down" data-board-id="${board.id}"></i>
+                    </button></span>
                 </div>
                 <div class="board-columns" data-board-id="${board.id}">
                 </div>
@@ -40,7 +46,7 @@ function boardBuilder(board) {
 }
 
 export function createNewBoardTitle(boardId = '') {
-    boardId = boardId ? `-${boardId}`: ""
+    boardId = boardId ? `-${boardId}` : ""
     return `<input type="text" 
                     placeholder="Board Title" 
                     id="new-board-title${boardId}" >
@@ -76,7 +82,7 @@ function addStatusBuilder(boardId) {
             </div>`
 }
 
-function addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId=null) {
+function addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId = null) {
     return `
 <div class="modal fade" id="AddColumnModal${boardId}" role="dialog">
     <div class="modal-dialog">
@@ -96,4 +102,13 @@ function addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId=nu
         </div>
     </div>
 </div>`
+}
+
+function addCreateCardBuilder(boardId) {
+    return `<button class="board-add-new-card" data-board-id="${boardId}">Create new card</button>`
+}
+
+export function createNewCardInputBuilder(boardId) {
+    return `<input type="text" placeholder="Card name" id="new-card-input-field${boardId}" data-board-id="${boardId}">
+           <button id="new-card${boardId}" class="" data-board-id="${boardId}" disabled>Save</button>`
 }

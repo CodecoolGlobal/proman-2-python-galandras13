@@ -16,6 +16,7 @@ const game = {
 export let cardsManager = {
     loadCards: async function (boardId) {
         const cards = await dataHandler.getCardsByBoardId(boardId);
+        cards.sort( sortByCardOrder );
         for (let card of cards) {
             const cardBuilder = htmlFactory(htmlTemplates.card);
             const content = cardBuilder(card);
@@ -27,6 +28,16 @@ export let cardsManager = {
         await initDragEvents();
     },
 };
+
+function sortByCardOrder( a, b ) {
+  if ( a.card_order < b.card_order ){
+    return -1;
+  }
+  if ( a.card_order > b.card_order ){
+    return 1;
+  }
+  return 0;
+}
 
 async function deleteButtonHandler(clickEvent) {
     const boardId = clickEvent.currentTarget.dataset.boardId;
