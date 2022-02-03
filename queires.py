@@ -163,3 +163,12 @@ def delete_card(card_id):
         FROM cards
         WHERE id = %(card_id)s;
         """, {"card_id": card_id}, select=False)
+
+
+def delete_board(board_id):
+    data_manager.execute_select(
+        """
+        DELETE
+        FROM boards
+        WHERE id = %(board_id)s;
+        """, {"board_id": board_id}, select=False)

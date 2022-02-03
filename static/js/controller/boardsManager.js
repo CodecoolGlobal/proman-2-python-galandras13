@@ -14,6 +14,7 @@ export let boardsManager = {
       // domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
       domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
       domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
+      domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard)
     }
   },
   loadStatuses: async function (){
@@ -69,6 +70,7 @@ async function showHideButtonHandler(clickEvent) {
 
 
 function renameTable(clickEvent) {
+    clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const selectorString = `.board-title[data-board-id="${boardId}"]`
     const rename = document.querySelector(selectorString)
@@ -129,4 +131,11 @@ function hideForm(createButton, inputField, submitButton) {
   createButton.parentElement.removeChild(inputField);
   createButton.parentElement.removeChild(submitButton);
   createButton.classList.toggle('hidden');
+}
+
+async function deleteBoard(clickEvent) {
+    clickEvent.stopPropagation();
+    const boardId = clickEvent.target.dataset.boardId;
+    await dataHandler.deleteBoard(boardId);
+    await reset();
 }
