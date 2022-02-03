@@ -21,25 +21,14 @@ export let boardsManager = {
   },
   createBoard: async function () {
     domManager.addEventListener('#create-new-board', "click", createBoardHandler);
-  }
-};
-
-async function showHideButtonHandler(clickEvent) {
-    const boardId = clickEvent.target.dataset.boardId;
-    const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-    const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
-    button.classList.toggle("rotate");
-    columContainer.classList.toggle("show-board-content");
-    if (columContainer.classList.contains("show-board-content")) {
-        await showCards(boardId);
-        await cardsManager.loadCards(boardId);
-        await cardsManager.initDragAndDrop(boardId);
-    } else {
-        await hideCards(boardId);
-    }
-}
-
-const showCards = async (boardId) => {
+  },
+  hideCards: async function (boardId) {
+    const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+    const modalChild = document.querySelector(`#AddColumnModal${boardId}`);
+    modalChild.parentElement.removeChild(modalChild);
+    statusContainer.innerHTML = "";
+  },
+  showCards: async function (boardId) {
     let statuses = await boardsManager.loadStatuses();
     for (let status of statuses) {
         if (status.board_id === parseInt(boardId)) {
@@ -61,13 +50,23 @@ const showCards = async (boardId) => {
     // domManager.addEventListener(`.add-column[data-board-id="${boardId}"]`, "click", addModal);
     domManager.addEventListener(`#modalSubmitButton${boardId}`, "click", addColumn);
 }
+};
 
-const hideCards = async (boardId) => {
-    const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-    const modalChild = document.querySelector(`#AddColumnModal${boardId}`);
-    modalChild.parentElement.removeChild(modalChild);
-    statusContainer.innerHTML = "";
+async function showHideButtonHandler(clickEvent) {
+    const boardId = clickEvent.target.dataset.boardId;
+    const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+    const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
+    button.classList.toggle("rotate");
+    columContainer.classList.toggle("show-board-content");
+    if (columContainer.classList.contains("show-board-content")) {
+        await boardsManager.showCards(boardId);
+        await cardsManager.loadCards(boardId);
+        await cardsManager.initDragAndDrop(boardId);
+    } else {
+        await boardsManager.hideCards(boardId);
+    }
 }
+
 
 function renameTable(clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
@@ -87,8 +86,8 @@ async function addColumn(clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const newColumnTitle = document.querySelector(`#modalInputId${boardId}`).value;
     await dataHandler.createNewCard(boardId, newColumnTitle);
-    await hideCards(boardId);
-    await showCards(boardId);
+    await boardsManager.hideCards(boardId);
+    await boardsManager.showCards(boardId);
     await cardsManager.loadCards(boardId);
     await cardsManager.initDragAndDrop(boardId);
 }

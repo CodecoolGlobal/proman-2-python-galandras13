@@ -131,6 +131,12 @@ def update_cards_by_card_id():
     return jsonify_dict({'message': f" Failed to update card with id:{card_id}."})
 
 
+@app.route('/api/cards/<card_id>', methods=['DELETE'])
+def delete_card(card_id):
+    queires.delete_card(card_id)
+    return "#"
+
+
 @app.route('/api/add-new-column', methods=["POST"])
 def add_new_column():
     board_id = request.json['board_id']

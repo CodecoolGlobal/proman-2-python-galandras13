@@ -154,3 +154,12 @@ def create_status(title, board_id):
         VALUES (%(title)s, %(board_id)s)
         """, {'title': title, 'board_id': board_id}, select=False
     )
+
+
+def delete_card(card_id):
+    data_manager.execute_select(
+        """
+        DELETE
+        FROM cards
+        WHERE id = %(card_id)s;
+        """, {"card_id": card_id}, select=False)
