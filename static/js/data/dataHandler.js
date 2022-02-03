@@ -44,8 +44,8 @@ export let dataHandler = {
     const payload = {"board_id": boardId, "new_column_title": newColumnTitle};
     await apiPost(`/api/add-new-column`, payload);
   },
-  updateCards: async function (payload) {
-    await apiPost(`/api/update/card`, payload);
+  updateCards: function (payload) {
+    apiPost(`/api/update/card`, payload);
   },
   deleteCard: async function (cardId) {
     await apiDelete(`/api/cards/${cardId}`);

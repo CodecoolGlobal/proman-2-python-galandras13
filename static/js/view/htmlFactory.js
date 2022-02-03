@@ -49,15 +49,18 @@ export function createNewBoardTitle(boardId = '') {
     boardId = boardId ? `-${boardId}` : ""
     return `<input type="text" 
                     placeholder="Board Title" 
-                    id="new-board-title${boardId}">
+                    id="new-board-title${boardId}"
+                    autofocus>
            <button id="submit-new-board-title${boardId}">Submit</button>`
 }
 
 export function newColumnTitle(boardId = "", statusId="") {
     return `<input type="text" 
-                    placeholder="Enter new card title" 
-                    id="new-card-title-${boardId}">
-            <button id="submit-new-card-${boardId}" data-board-id="${boardId}">Submit</button>`
+                    placeholder="Enter new column title" 
+                    id="new-column-title-${boardId}${statusId}"
+                    data-board-id="${boardId}"
+                    data-card-id="${statusId}"
+                    autofocus>`
 }
 
 export function newCardTitle(boardId = "", cardId = "") {
@@ -70,13 +73,15 @@ export function newCardTitle(boardId = "", cardId = "") {
 }
 
 export function createNewBoard() {
-    return `<input type="text" placeholder="Board Title" id="new-board-input-field">
+    return `<input type="text" placeholder="Board Title" id="new-board-input-field" autofocus>
            <button id="new-board">Save</button>`
 }
 
 function cardBuilder(card) {
     return `<div class="card" data-card-id="${card.id}" data-board-id="${card.board_id}">
-                <div class="card-title"  data-card-id="${card.id}" data-board-id="${card.board_id}"><span class="card" data-card-id="${card.id}" data-board-id="${card.board_id}">${card.title}</span></div>
+                <div class="card-title"  data-card-id="${card.id}" data-board-id="${card.board_id}">
+                    <span class="cardName" data-card-id="${card.id}" data-board-id="${card.board_id}">${card.title}</span>
+                </div>
                 <div class="card-remove" data-card-id="${card.id}" data-board-id="${card.board_id}"><i class="fas fa-trash-alt"></i></div>
             </div>`;
 }
@@ -109,7 +114,7 @@ function addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId = 
             </div>
             <div class="modal-body">
                 <label for="modalInputId${boardId}">${modalLabelText}</label>
-                <input type="text" id="modalInputId${boardId}" placeholder="${placeholderText}" minlength="1" data-board-id="${boardId}" required>
+                <input type="text" id="modalInputId${boardId}" placeholder="${placeholderText}" minlength="1" data-board-id="${boardId}" required autofocus>
             </div>
             <div class="modal-footer">
                 <span class="board-id-for-modal"></span>
@@ -125,6 +130,6 @@ function addCreateCardBuilder(boardId) {
 }
 
 export function createNewCardInputBuilder(boardId) {
-    return `<input type="text" placeholder="Card name" id="new-card-input-field${boardId}" data-board-id="${boardId}">
+    return `<input type="text" placeholder="Card name" id="new-card-input-field${boardId}" data-board-id="${boardId}" autofocus>
            <button id="new-card${boardId}" class="" data-board-id="${boardId}" disabled>Save</button>`
 }

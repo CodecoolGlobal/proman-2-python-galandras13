@@ -16,13 +16,13 @@ const game = {
 export let cardsManager = {
     loadCards: async function (boardId) {
         const cards = await dataHandler.getCardsByBoardId(boardId);
-        cards.sort( sortByCardOrder );
+        cards.sort(sortByCardOrder);
         for (let card of cards) {
             const cardBuilder = htmlFactory(htmlTemplates.card);
             const content = cardBuilder(card);
             domManager.addChild(`.board-column-content[data-status-id="${card.status_id}"][data-board-id="${boardId}"]`, content);
             domManager.addEventListener(`.card-remove[data-card-id="${card.id}"]`, "click", deleteButtonHandler);
-            domManager.addEventListener(`.card[data-card-id="${card.id}"][data-board-id="${card.board_id}"]`, "click", renameCard)
+            domManager.addEventListener(`.cardName[data-card-id="${card.id}"][data-board-id="${card.board_id}"]`, "click", renameCard);
         }
     }, initDragAndDrop: async function (boardId) {
         await initElements(boardId);
@@ -30,31 +30,53 @@ export let cardsManager = {
     }
 };
 
-function renameCard(clickEvent) {
+async function renameCard(clickEvent) {
     const cardId = clickEvent.target.dataset.cardId;
     const boardId = clickEvent.target.dataset.boardId;
-    const selectorString = `.card[data-card-id="${cardId}"]`
-    const rename = document.querySelector(selectorString)
-    rename.innerHTML = newCardTitle(boardId)
-    domManager.addEventListener(`#submit-new-card-${boardId}`, 'click', async () => {
-        const modifiedTitle = document.querySelector(`#new-card-title-${boardId}`).value;
-        await dataHandler.renameCard(cardId, modifiedTitle);
-        await boardsManager.hideCards(boardId);
-        await boardsManager.showCards(boardId);
-        await cardsManager.loadCards(boardId);
-        await cardsManager.initDragAndDrop(boardId);
-    })
+    const renameCardCurrentName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
+    renameCardCurrentName.classList.add("hidden");
+    const renameCardContent = newCardTitle(boardId, cardId);
+    domManager.addChildAfterBegin(`.card[data-card-id="${cardId}"]`, renameCardContent);
+    domManager.addEventListener(`#new-card-title-${boardId}`, "keydown", keyDownOnRenameCard);
+    domManager.addEventListener(`#new-card-title-${boardId}`, "click", noClickEvent);
+    domManager.addEventListener(`#new-card-title-${boardId}`, "focusout", cancelNameChange)
+    document.querySelector(`#new-card-title-${boardId}`).focus()
 }
 
+async function keyDownOnRenameCard(e) {
+    const cardId = e.target.dataset.cardId;
+    const boardId = e.target.dataset.boardId;
+    if (e.key === 'Enter') {
+        if (e.target.value) {
+            const modifiedTitle = document.querySelector(`#new-card-title-${boardId}`).value;
+            await dataHandler.renameCard(cardId, modifiedTitle);
+            await boardsManager.refreshBoard(boardId);
+        }
+    } else if (e.key === "Escape") {
+        const inputField = document.querySelector(`#new-card-title-${boardId}`);
+        const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`)
+        inputField.parentElement.removeChild(inputField);
+        currentCardName.classList.remove("hidden");
+    }
+}
 
-function sortByCardOrder( a, b ) {
-  if ( a.card_order < b.card_order ){
-    return -1;
-  }
-  if ( a.card_order > b.card_order ){
-    return 1;
-  }
-  return 0;
+async function cancelNameChange(e) {
+    const cardId = e.target.dataset.cardId;
+    const boardId = e.target.dataset.boardId;
+    const inputField = document.querySelector(`#new-card-title-${boardId}`);
+    const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`)
+    inputField.parentElement.removeChild(inputField);
+    currentCardName.classList.remove("hidden");
+}
+
+function sortByCardOrder(a, b) {
+    if (a.card_order < b.card_order) {
+        return -1;
+    }
+    if (a.card_order > b.card_order) {
+        return 1;
+    }
+    return 0;
 }
 
 async function deleteButtonHandler(clickEvent) {
@@ -87,7 +109,6 @@ function initDragEvents() {
 }
 
 function initDraggable(draggable) {
-    draggable.setAttribute("draggable", true);
     draggable.addEventListener("dragstart", handleDragStart);
     draggable.addEventListener("dragend", handleDragEnd);
 }
@@ -102,18 +123,10 @@ function initDropzone(dropzone) {
 function handleDragStart(e) {
     game.dragged = e.currentTarget;
     game.dragged.classList.add("currently-dragged");
-    ui.slots.forEach(function (slots) {
-        slots.classList.add("highlighted-slots");
-    });
 }
 
 function handleDragEnd() {
     game.dragged.classList.remove("currently-dragged");
-    ui.slots.forEach(function (slots) {
-        slots.classList.remove("highlighted-slots");
-        slots.classList.remove("highlighted-good-slots");
-        slots.classList.remove("highlighted-bad-slots");
-    });
     const boardId = game.dragged.dataset.boardId;
     const columns = document.querySelectorAll(`.board-column-content[data-board-id="${boardId}"]`);
     for (let column of columns) {
@@ -179,9 +192,9 @@ function getDragAfterElement(container, y) {
         const box = child.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
         if (offset < 0 && offset > closest.offset) {
-            return { offset: offset, element: child}
+            return {offset: offset, element: child}
         } else {
             return closest;
         }
-    }, { offset: Number.NEGATIVE_INFINITY }).element
+    }, {offset: Number.NEGATIVE_INFINITY}).element
 }

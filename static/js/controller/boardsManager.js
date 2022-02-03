@@ -11,7 +11,6 @@ export let boardsManager = {
       const boardBuilder = htmlFactory(htmlTemplates.board);
       const content = boardBuilder(board);
       domManager.addChild("#root", content);
-      // domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
       domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
       domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
       domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard);
@@ -73,8 +72,6 @@ function renameTable(clickEvent) {
     const selectorString = `.board-title[data-board-id="${boardId}"]`
     const rename = document.querySelector(selectorString)
     rename.innerHTML = createNewBoardTitle(boardId)
-    // const boardId = clickEvent.target.dataset.boardId;
-    // clickEvent.target.innerHTML = createNewBoardTitle(boardId);
     domManager.addEventListener(`#submit-new-board-title-${boardId}`, 'click', async () => {
         const updatedBoardTitle = document.querySelector(`#new-board-title-${boardId}`).value
         await dataHandler.updateBoardTitle(boardId, updatedBoardTitle)
@@ -123,7 +120,7 @@ async function checkCreateCardInput(e) {
     createCardButton.disabled = !e.target.value;
 }
 
-async function noClickEvent(e) {
+export async function noClickEvent(e) {
     e.stopPropagation();
 }
 
@@ -139,11 +136,6 @@ function createBoardHandler(clickEvent) {
         const inputField = document.querySelector(inputFieldSelector);
         const submitButton = document.querySelector('#new-board');
         inputField.focus();
-        // domManager.addEventListener(inputFieldSelector, "focusout", () => {
-        //   buttonSpan.removeChild(inputField);
-        //   buttonSpan.removeChild(submitButton);
-        //   createButton.classList.toggle('hidden');
-        // });
         domManager.addEventListener('#new-board', "click", async () => {
             const title = inputField.value;
             const userId = createButton.dataset.userId;
