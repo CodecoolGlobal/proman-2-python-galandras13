@@ -1,6 +1,8 @@
 import {dataHandler} from "../data/dataHandler.js";
 import {htmlFactory, htmlTemplates} from "../view/htmlFactory.js";
 import {domManager} from "../view/domManager.js";
+import {reset} from "../main.js";
+import {boardsManager} from "./boardsManager.js";
 
 const ui = {
     slots: null,
@@ -18,7 +20,7 @@ export let cardsManager = {
             const cardBuilder = htmlFactory(htmlTemplates.card);
             const content = cardBuilder(card);
             domManager.addChild(`.board-column-content[data-status-id="${card.status_id}"][data-board-id="${boardId}"]`, content);
-            domManager.addEventListener(`.card[data-card-id="${card.id}"]`, "click", deleteButtonHandler);
+            domManager.addEventListener(`.card-remove[data-card-id="${card.id}"]`, "click", deleteButtonHandler);
         }
     }, initDragAndDrop: async function (boardId) {
         await initElements(boardId);
@@ -26,7 +28,14 @@ export let cardsManager = {
     },
 };
 
-function deleteButtonHandler(clickEvent) {
+async function deleteButtonHandler(clickEvent) {
+    const boardId = clickEvent.currentTarget.dataset.boardId;
+    const cardId = clickEvent.currentTarget.dataset.cardId;
+    await dataHandler.deleteCard(cardId);
+    await boardsManager.hideCards(boardId);
+    await boardsManager.showCards(boardId);
+    await cardsManager.loadCards(boardId);
+    await cardsManager.initDragAndDrop(boardId);
 }
 
 function initElements(boardId) {

@@ -46,7 +46,11 @@ export let dataHandler = {
   },
   updateCards: function (payload) {
     apiPost(`/api/update/card`, payload);
+  },
+  deleteCard: async function (cardId) {
+    await apiDelete(`/api/cards/${cardId}`);
   }
+
 };
 
 async function apiGet(url) {
