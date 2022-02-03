@@ -14,7 +14,8 @@ export let boardsManager = {
       // domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
       domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
       domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
-      domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard)
+      domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard);
+
     }
   },
   loadStatuses: async function (){
@@ -36,6 +37,7 @@ export let boardsManager = {
             const statusBuilder = htmlFactory(htmlTemplates.status);
             const content = statusBuilder(status, boardId);
             domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
+            domManager.addEventListener(`#delete-column-button-${boardId}-${status.id}`, "click", deleteColumn)
         }
     }
     const addStatusButton = htmlFactory(htmlTemplates.addStatusButton);
@@ -138,4 +140,14 @@ async function deleteBoard(clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     await dataHandler.deleteBoard(boardId);
     await reset();
+}
+
+async function deleteColumn(clickEvent) {
+    const boardId = clickEvent.target.dataset.boardId;
+    const statusId = clickEvent.target.dataset.statusId;
+    await dataHandler.deleteColumn(boardId, statusId);
+    await boardsManager.hideCards(boardId);
+    await boardsManager.showCards(boardId);
+    await cardsManager.loadCards(boardId);
+    await cardsManager.initDragAndDrop(boardId);
 }

@@ -172,3 +172,21 @@ def delete_board(board_id):
         FROM boards
         WHERE id = %(board_id)s;
         """, {"board_id": board_id}, select=False)
+
+
+def delete_columns(status_id):
+    data_manager.execute_select(
+        """
+        DELETE
+        FROM statuses
+        WHERE id = %(id)s
+        """, {"id": status_id}, select=False)
+
+
+def delete_column_cards(board_id, status_id):
+    data_manager.execute_select(
+        """
+        DELETE
+        FROM cards
+        WHERE board_id = %(board_id)s AND status_id = %(status_id)s
+        """, {"board_id": board_id, "status_id": status_id}, select=False)
