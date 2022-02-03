@@ -5,84 +5,70 @@ import {cardsManager} from "./cardsManager.js";
 import {reset} from "../main.js";
 
 export let boardsManager = {
-    loadBoards: async function () {
-        const boards = await dataHandler.getBoards();
-        for (let board of boards) {
-            const boardBuilder = htmlFactory(htmlTemplates.board);
-            const content = boardBuilder(board);
-            domManager.addChild("#root", content);
-            // domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
-            domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
-            domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
-            domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard);
-
+  loadBoards: async function () {
+    const boards = await dataHandler.getBoards();
+    for (let board of boards) {
+      const boardBuilder = htmlFactory(htmlTemplates.board);
+      const content = boardBuilder(board);
+      domManager.addChild("#root", content);
+      // domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
+      domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
+      domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
+      domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard);
+    }
+  },
+  loadStatuses: async function (){
+    return await dataHandler.getStatuses()
+  },
+  createBoard: async function () {
+    domManager.addEventListener('#create-new-board', "click", createBoardHandler);
+  },
+  hideCards: async function (boardId) {
+    const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+    const modalChild = document.querySelector(`#AddColumnModal${boardId}`);
+    const createCardContainer = document.querySelector(`.add-card-button-container${boardId}`);
+    modalChild.parentElement.removeChild(modalChild);
+    statusContainer.innerHTML = "";
+    createCardContainer.innerHTML = "";
+  },
+  showCards: async function (boardId) {
+    let statuses = await boardsManager.loadStatuses();
+    for (let status of statuses) {
+        if (status.board_id === parseInt(boardId)) {
+            const statusBuilder = htmlFactory(htmlTemplates.status);
+            const content = statusBuilder(status, boardId);
+            domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
+            domManager.addEventListener(`#delete-column-button-${boardId}-${status.id}`, "click", deleteColumn)
         }
-    },
-    loadStatuses: async function () {
-        return await dataHandler.getStatuses()
-    },
-    createBoard: async function () {
-        domManager.addEventListener('#create-new-board', "click", createBoardHandler);
-    },
-    hideCards: async function (boardId) {
-        const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-        const modalChild = document.querySelector(`#AddColumnModal${boardId}`);
-        const createCardContainer = document.querySelector(`.add-card-button-container${boardId}`);
-        modalChild.parentElement.removeChild(modalChild);
-        statusContainer.innerHTML = "";
-        createCardContainer.innerHTML = "";
-    },
-    showCards: async function (boardId) {
-        let statuses = await boardsManager.loadStatuses();
-        for (let status of statuses) {
-            if (status.board_id === parseInt(boardId)) {
-                const statusBuilder = htmlFactory(htmlTemplates.status);
-                const content = statusBuilder(status, boardId);
-                domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
-                domManager.addEventListener(`#delete-column-button-${boardId}-${status.id}`, "click", deleteColumn)
-            }
-        }
-        addCreateStatus(boardId);
-        addCreateCard(boardId);
-        const addStatusButton = htmlFactory(htmlTemplates.addStatusButton);
-        const addStatusButtonContent = addStatusButton(boardId)
-        domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, addStatusButtonContent);
-        const addModalBuilder = htmlFactory(htmlTemplates.addModal);
-        const modalTitle = "Add a column";
-        const modalLabelText = "Column name";
-        const placeholderText = "Enter a column name (To Do, in Progress, Done)";
-        const modalContent = addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId);
-        domManager.addChild(`#modalContainer`, modalContent);
-        domManager.addEventListener(`#modalInputId${boardId}`, "input", checkInput);
-        // domManager.addEventListener(`.add-column[data-board-id="${boardId}"]`, "click", addModal);
-        domManager.addEventListener(`#modalSubmitButton${boardId}`, "click", addColumn);
-    },
+    }
+    addCreateStatus(boardId);
+    addCreateCard(boardId);
+},
     refreshBoard: async function (boardId) {
         await boardsManager.hideCards(boardId);
         await boardsManager.showCards(boardId);
         await cardsManager.loadCards(boardId);
         await cardsManager.initDragAndDrop(boardId);
-    };
-
-    async function showHideButtonHandler(clickEvent) {
-        const boardId = clickEvent.target.dataset.boardId;
-        const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-        const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
-        button.classList.toggle("rotate");
-        columContainer.classList.toggle("show-board-content");
-        if (columContainer.classList.contains("show-board-content")) {
-            await boardsManager.showCards(boardId);
-            await cardsManager.loadCards(boardId);
-            await cardsManager.initDragAndDrop(boardId);
-        } else {
-            await boardsManager.hideCards(boardId);
-        }
     }
+};
+
+async function showHideButtonHandler(clickEvent) {
+    const boardId = clickEvent.target.dataset.boardId;
+    const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+    const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
+    button.classList.toggle("rotate");
+    columContainer.classList.toggle("show-board-content");
+    if (columContainer.classList.contains("show-board-content")) {
+        await boardsManager.showCards(boardId);
+        await cardsManager.loadCards(boardId);
+        await cardsManager.initDragAndDrop(boardId);
+    } else {
+        await boardsManager.hideCards(boardId);
+    }
+}
 
 
-    function renameTable(clickEvent)
-{
-    clickEvent.stopPropagation();
+function renameTable(clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const selectorString = `.board-title[data-board-id="${boardId}"]`
     const rename = document.querySelector(selectorString)
