@@ -82,8 +82,12 @@ function renameTable(clickEvent) {
 
 async function addColumn(clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
-    const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-
+    const newColumnTitle = document.querySelector(`#modalInputId${boardId}`).value;
+    await dataHandler.createNewCard(boardId, newColumnTitle);
+    await hideCards(boardId);
+    await showCards(boardId);
+    await cardsManager.loadCards(boardId);
+    await cardsManager.initDragAndDrop(boardId);
 }
 
 async function checkInput(e) {

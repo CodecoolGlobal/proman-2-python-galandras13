@@ -131,6 +131,15 @@ def update_cards_by_card_id():
     return jsonify_dict({'message': f" Failed to update card with id:{card_id}."})
 
 
+@app.route('/api/add-new-column', methods=["POST"])
+def add_new_column():
+    board_id = request.json['board_id']
+    new_column_title = request.json['new_column_title']
+    if queires.create_status(new_column_title, board_id):
+        return jsonify_dict({'message': f" Successfully added new column in board with id:{board_id}."})
+    return jsonify_dict({'message': f" Failed to add new column in board with id:{board_id}."})
+
+
 def main():
     app.run(debug=True)
 

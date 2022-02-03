@@ -29,18 +29,20 @@ export let dataHandler = {
   },
   createNewBoard: async function (boardTitle, privateBoard) {
     // creates new board, saves it and calls the callback function with its data
-    const payload = {"board_title": boardTitle, "private": privateBoard}
-    await apiPost('/api/newBoards', payload)
+    const payload = {"board_title": boardTitle, "private": privateBoard};
+    await apiPost('/api/newBoards', payload);
   },
   updateBoardTitle: async function (boardId, updatedBoardTitle) {
-    const payload = {"new_title": updatedBoardTitle}
-    await apiPut(`/api/modifiedBoards/${boardId}`, payload)
+    const payload = {"new_title": updatedBoardTitle};
+    await apiPut(`/api/modifiedBoards/${boardId}`, payload);
   },
   deleteBoard: async function (boardId) {
-    await apiDelete(`/api/boards/${boardId}`)
+    await apiDelete(`/api/boards/${boardId}`);
   },
-  createNewCard: async function (cardTitle, boardId, statusId) {
+  createNewCard: async function (boardId, newColumnTitle) {
     // creates new card, saves it and calls the callback function with its data
+    const payload = {"board_id": boardId, "new_column_title": newColumnTitle};
+    await apiPost(`/api/add-new-column`, payload);
   },
   updateCards: function (payload) {
     apiPost(`/api/update/card`, payload);
@@ -75,7 +77,7 @@ async function apiDelete(url, payload="") {
       'Content-Type': 'application/json'},
       method: 'DELETE',
       body: JSON.stringify(payload)
-  })
+  });
 }
 
 async function apiPut(url, payload="") {
@@ -85,5 +87,5 @@ async function apiPut(url, payload="") {
       'Content-Type': 'application/json'},
       method: 'PUT',
       body: JSON.stringify(payload)
-  })
+  });
 }

@@ -102,7 +102,6 @@ def get_user(username):
     return result
 
 
-
 def update_card_by_card_id(card_id, card_order, status_id):
     data_manager.execute_update(
         """
