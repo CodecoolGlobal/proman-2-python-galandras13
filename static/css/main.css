@@ -284,3 +284,7 @@ section.board {
     /*width: inherit;*/
     /*text-align: end;*/
 }
+
+input {
+    color: black;
+}
