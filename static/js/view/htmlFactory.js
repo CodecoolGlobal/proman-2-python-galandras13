@@ -40,7 +40,6 @@ function boardBuilder(board) {
 }
 
 export function createNewBoardTitle(boardId = '') {
-    console.log('asd');
     boardId = boardId ? `-${boardId}`: ""
     return `<input type="text" 
                     placeholder="Board Title" 
@@ -49,7 +48,8 @@ export function createNewBoardTitle(boardId = '') {
 }
 
 export function createNewBoard() {
-    return `<button type="button" id="new-board">Submit new board</button>`
+    return `<input type="text" placeholder="Board Title" id="new-board-input-field">
+           <button id="new-board">Save</button>`
 }
 
 function cardBuilder(card) {

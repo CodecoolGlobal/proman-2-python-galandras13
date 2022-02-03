@@ -36,9 +36,11 @@
         {% if not session.username %}
             <a id="registration" href="/registration">Register</a>
             <a id="login" href="/login">Login</a>
+            <span id="add-new-board"><button id="create-new-board" data-user-id="">Create new board</button></span>
         {% else %}
             <span id="welcome">Welcome, {{ session.username }}.</span>
             <a id="logout" href="/logout">Logout</a>
+            <span id="add-new-board"><button id="create-new-board" data-user-id="{{ session.id }}">Create new private board</button></span>
         {% endif %}
         <div class="dot"></div>
     </nav>

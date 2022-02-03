@@ -81,12 +81,17 @@ INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 7, 'planning', 1);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 8, 'done card 1', 1);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 8, 'done card 1', 2);
 
+INSERT INTO users(username, password)  VALUES ('admin', 'admin');
+
 ---
 --- add constraints
 ---
 
 ALTER TABLE ONLY cards
-    ADD CONSTRAINT fk_cards_board_id FOREIGN KEY (board_id) REFERENCES boards(id);
+    ADD CONSTRAINT fk_cards_board_id FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY cards
-    ADD CONSTRAINT fk_cards_status_id FOREIGN KEY (status_id) REFERENCES statuses(id);
+    ADD CONSTRAINT fk_cards_status_id FOREIGN KEY (status_id) REFERENCES statuses(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY statuses
+    ADD CONSTRAINT fk_statuses_board_id FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE;

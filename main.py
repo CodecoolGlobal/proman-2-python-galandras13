@@ -25,7 +25,8 @@ def get_boards():
     """
     All the boards
     """
-    return queires.get_boards()
+    user_id = session['id'] if 'id' in session else None
+    return queires.get_boards(user_id)
 
 
 @app.route("/api/boards/<board_id>")
@@ -65,8 +66,7 @@ def get_card(card_id):
 @app.route("/api/newBoards", methods=['POST'])
 def create_board():
     board_title = request.get_json()["board_title"]
-    private = request.get_json()["private"]
-    user_id = session.get("id", None) if private else None
+    user_id = request.get_json()["user_id"] if request.get_json()["user_id"] else None
     queires.create_board(board_title, user_id)
     return redirect("/")
 

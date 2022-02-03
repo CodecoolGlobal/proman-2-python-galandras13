@@ -18,7 +18,7 @@ def get_card_status(status_id):
     return status
 
 
-def get_boards():
+def get_boards(user_id=None):
     """
     Gather all boards
     :return:
@@ -27,8 +27,9 @@ def get_boards():
     # return [{"title": "board1", "id": 1}, {"title": "board2", "id": 2}]
 
     return data_manager.execute_select(
-        """
+        f"""
         SELECT * FROM boards
+        WHERE user_id IS NULL {'OR user_id= ' + str(user_id) if user_id else ''}
         ORDER BY id;
         """
     )
@@ -100,7 +101,6 @@ def get_user(username):
         WHERE username = %(username)s;
         """, {"username": username}, fetchall=False)
     return result
-
 
 
 def update_card_by_card_id(card_id, card_order, status_id):
