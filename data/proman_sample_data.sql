@@ -81,7 +81,7 @@ INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 7, 'planning', 1);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 8, 'done card 1', 1);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 8, 'done card 1', 2);
 
-INSERT INTO users(username, password)  VALUES ('admin', 'admin');
+INSERT INTO users(username, password)  VALUES ('admin', '$2b$12$T.dBeyku3wmmBW57N0qxkeIGU6shrmBJebokl0//0JhgXrqnRog4.');
 
 ---
 --- add constraints
