@@ -71,12 +71,27 @@ def create_board():
     return redirect("/")
 
 
-@app.route("/api/modifiedBoards/<board_id>", methods=['PUT'])
+@app.route("/api/modifiedBoards/<board_id>", methods=['GET', 'PUT'])
 def update_board(board_id):
     request_json = request.get_json()
     modified_name = request_json["new_title"]
     queires.modify_board_title(board_id, modified_name)
     return redirect("/")
+
+
+@app.route('/api/<board_id>/create-card', methods=['POST'])
+def create_new_card(board_id):
+    new_card_name = request.json["new_card_name"]
+    status_id = queires.get_first_status_by_board_id(board_id)["id"]
+    card_order = queires.get_card_order_by_status_id(status_id)
+    if card_order["card_order"] is None:
+        card_order = 0
+    else:
+        card_order = card_order["card_order"] + 1
+    if queires.create_card(new_card_name, board_id, status_id, card_order):
+        return jsonify_dict({'message': f" Successfully added new card: {new_card_name}."})
+    return jsonify_dict({'message': f" Failed to add new card: {new_card_name}."})
+
 
 
 # @app.route("/api/boards/<board_id>", methods=['DELETE'])

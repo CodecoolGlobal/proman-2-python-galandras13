@@ -257,3 +257,26 @@ section.board {
 .hidden {
     display: none;
 }
+
+.add-card-button-container{
+    margin-left: 5rem;
+}
+
+.board-header{
+    /*display:flex;*/
+    align-items: center;
+    /*width: 100%;*/
+    /*justify-content:flex-end;*/
+    /*align-items:center;*/
+}
+
+.toggle-board-button {
+    float: right;
+    margin: 13px;
+}
+
+.toggle-board-button-container {
+    /*margin-left: 20px;*/
+    /*width: inherit;*/
+    /*text-align: end;*/
+}

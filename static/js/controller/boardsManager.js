@@ -1,54 +1,58 @@
 import {dataHandler} from "../data/dataHandler.js";
-import {createNewBoardTitle, createNewBoard, htmlFactory, htmlTemplates} from "../view/htmlFactory.js";
+import {
+    createNewBoardTitle,
+    createNewBoard,
+    htmlFactory,
+    htmlTemplates,
+} from "../view/htmlFactory.js";
 import {domManager} from "../view/domManager.js";
 import {cardsManager} from "./cardsManager.js";
 import {reset} from "../main.js";
 
+
 export let boardsManager = {
-  loadBoards: async function () {
-    const boards = await dataHandler.getBoards();
-    for (let board of boards) {
-      const boardBuilder = htmlFactory(htmlTemplates.board);
-      const content = boardBuilder(board);
-      domManager.addChild("#root", content);
-      // domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
-      domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
-      domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
-    }
-  },
-  loadStatuses: async function (){
-    return await dataHandler.getStatuses()
-  },
-  createBoard: async function () {
-    domManager.addEventListener('#create-new-board', "click", createBoardHandler);
-  },
-  hideCards: async function (boardId) {
-    const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-    const modalChild = document.querySelector(`#AddColumnModal${boardId}`);
-    modalChild.parentElement.removeChild(modalChild);
-    statusContainer.innerHTML = "";
-  },
-  showCards: async function (boardId) {
-    let statuses = await boardsManager.loadStatuses();
-    for (let status of statuses) {
-        if (status.board_id === parseInt(boardId)) {
-            const statusBuilder = htmlFactory(htmlTemplates.status);
-            const content = statusBuilder(status, boardId);
-            domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
+    loadBoards: async function () {
+        const boards = await dataHandler.getBoards();
+        for (let board of boards) {
+            const boardBuilder = htmlFactory(htmlTemplates.board);
+            const content = boardBuilder(board);
+            domManager.addChild("#root", content);
+            // domManager.addEventListener(`.toggle-board-button[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
+            domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
+            domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
         }
-    }
-    const addStatusButton = htmlFactory(htmlTemplates.addStatusButton);
-    const addStatusButtonContent = addStatusButton(boardId)
-    domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, addStatusButtonContent);
-    const addModalBuilder = htmlFactory(htmlTemplates.addModal);
-    const modalTitle = "Add a column";
-    const modalLabelText = "Column name";
-    const placeholderText = "Enter a column name (To Do, in Progress, Done)";
-    const modalContent = addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId);
-    domManager.addChild(`#modalContainer`, modalContent);
-    domManager.addEventListener(`#modalInputId${boardId}`, "input", checkInput);
-    // domManager.addEventListener(`.add-column[data-board-id="${boardId}"]`, "click", addModal);
-    domManager.addEventListener(`#modalSubmitButton${boardId}`, "click", addColumn);
+    },
+    loadStatuses: async function () {
+        return await dataHandler.getStatuses()
+    },
+    createBoard: async function () {
+        domManager.addEventListener('#create-new-board', "click", createBoardHandler);
+    },
+    hideCards: async function (boardId) {
+        const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+        const modalChild = document.querySelector(`#AddColumnModal${boardId}`);
+        const createCardContainer = document.querySelector(`.add-card-button-container${boardId}`);
+        modalChild.parentElement.removeChild(modalChild);
+        statusContainer.innerHTML = "";
+        createCardContainer.innerHTML = "";
+    },
+    showCards: async function (boardId) {
+        let statuses = await boardsManager.loadStatuses();
+        for (let status of statuses) {
+            if (status.board_id === parseInt(boardId)) {
+                const statusBuilder = htmlFactory(htmlTemplates.status);
+                const content = statusBuilder(status, boardId);
+                domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
+            }
+        }
+        addCreateStatus(boardId);
+        addCreateCard(boardId);
+    },
+    refreshBoard: async function (boardId) {
+        await boardsManager.hideCards(boardId);
+        await boardsManager.showCards(boardId);
+        await cardsManager.loadCards(boardId);
+        await cardsManager.initDragAndDrop(boardId);
 }
 };
 
@@ -69,27 +73,49 @@ async function showHideButtonHandler(clickEvent) {
 
 
 function renameTable(clickEvent) {
+    clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const selectorString = `.board-title[data-board-id="${boardId}"]`
     const rename = document.querySelector(selectorString)
     rename.innerHTML = createNewBoardTitle(boardId)
     // const boardId = clickEvent.target.dataset.boardId;
     // clickEvent.target.innerHTML = createNewBoardTitle(boardId);
+    // domManager.addEventListener(`#new-board-title${boardId}`, "click", noClickEvent);
     domManager.addEventListener(`#submit-new-board-title-${boardId}`, 'click', async () => {
+        clickEvent.stopPropagation();
         const updatedBoardTitle = document.querySelector(`#new-board-title-${boardId}`).value
         await dataHandler.updateBoardTitle(boardId, updatedBoardTitle)
         await reset()
     })
 }
 
+async function addCardInput(clickEvent) {
+    clickEvent.stopPropagation();
+    const boardId = clickEvent.target.dataset.boardId;
+    const createNewCard = htmlFactory(htmlTemplates.createNewCard);
+    const createNewCardInputContent = createNewCard(boardId);
+    const createCardButton = document.querySelector(`.board-add-new-card[data-board-id="${boardId}"]`);
+    createCardButton.classList.add("hidden");
+    domManager.addChild(`.add-card-button-container${boardId}`, createNewCardInputContent);
+    domManager.addEventListener(`#new-card${boardId}`, "click", addCard);
+    domManager.addEventListener(`#new-card-input-field${boardId}`, "input", checkCreateCardInput);
+    domManager.addEventListener(`#new-card-input-field${boardId}`, "click", noClickEvent);
+}
+
+async function addCard(clickEvent) {
+    clickEvent.stopPropagation();
+    const boardId = clickEvent.target.dataset.boardId;
+    const createCardInputField = document.querySelector(`#new-card-input-field${boardId}`);
+    const newCardName = createCardInputField.value;
+    await dataHandler.createNewCard(boardId, newCardName);
+    await boardsManager.refreshBoard(boardId);
+}
+
 async function addColumn(clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const newColumnTitle = document.querySelector(`#modalInputId${boardId}`).value;
-    await dataHandler.createNewCard(boardId, newColumnTitle);
-    await boardsManager.hideCards(boardId);
-    await boardsManager.showCards(boardId);
-    await cardsManager.loadCards(boardId);
-    await cardsManager.initDragAndDrop(boardId);
+    await dataHandler.createNewColumn(boardId, newColumnTitle);
+    await boardsManager.refreshBoard(boardId);
 }
 
 async function checkInput(e) {
@@ -98,35 +124,66 @@ async function checkInput(e) {
     createColumnButton.disabled = !e.target.value;
 }
 
-function createBoardHandler(clickEvent) {
-  const buttonSpan = clickEvent.target.parentElement;
-  const createButton = clickEvent.target;
-  const inputFieldSelector = `#new-board-input-field`;
+async function checkCreateCardInput(e) {
+    const boardId = e.target.dataset.boardId;
+    const createCardButton = document.querySelector(`#new-card${boardId}`);
+    createCardButton.disabled = !e.target.value;
+}
 
-  if (!document.querySelector(inputFieldSelector)) {
-    createButton.classList.toggle('hidden');
-    const textBox = createNewBoard();
-    buttonSpan.insertAdjacentHTML('afterbegin', textBox);
-    const inputField = document.querySelector(inputFieldSelector);
-    const submitButton = document.querySelector('#new-board');
-    inputField.focus();
-    // domManager.addEventListener(inputFieldSelector, "focusout", () => {
-    //   buttonSpan.removeChild(inputField);
-    //   buttonSpan.removeChild(submitButton);
-    //   createButton.classList.toggle('hidden');
-    // });
-    domManager.addEventListener('#new-board', "click", async () => {
-      const title = inputField.value;
-      const userId = createButton.dataset.userId;
-      await dataHandler.createNewBoard(title, userId);
-      await reset();
-      hideForm(createButton, inputField, submitButton);
-    });
-  }
+async function noClickEvent(e) {
+    e.stopPropagation();
+}
+
+function createBoardHandler(clickEvent) {
+    const buttonSpan = clickEvent.target.parentElement;
+    const createButton = clickEvent.target;
+    const inputFieldSelector = `#new-board-input-field`;
+
+    if (!document.querySelector(inputFieldSelector)) {
+        createButton.classList.toggle('hidden');
+        const textBox = createNewBoard();
+        buttonSpan.insertAdjacentHTML('afterbegin', textBox);
+        const inputField = document.querySelector(inputFieldSelector);
+        const submitButton = document.querySelector('#new-board');
+        inputField.focus();
+        // domManager.addEventListener(inputFieldSelector, "focusout", () => {
+        //   buttonSpan.removeChild(inputField);
+        //   buttonSpan.removeChild(submitButton);
+        //   createButton.classList.toggle('hidden');
+        // });
+        domManager.addEventListener('#new-board', "click", async () => {
+            const title = inputField.value;
+            const userId = createButton.dataset.userId;
+            await dataHandler.createNewBoard(title, userId);
+            await reset();
+            hideForm(createButton, inputField, submitButton);
+        });
+    }
 }
 
 function hideForm(createButton, inputField, submitButton) {
-  createButton.parentElement.removeChild(inputField);
-  createButton.parentElement.removeChild(submitButton);
-  createButton.classList.toggle('hidden');
+    createButton.parentElement.removeChild(inputField);
+    createButton.parentElement.removeChild(submitButton);
+    createButton.classList.toggle('hidden');
+}
+
+function addCreateStatus(boardId) {
+    const addStatusButton = htmlFactory(htmlTemplates.addStatusButton);
+    const addStatusButtonContent = addStatusButton(boardId)
+    domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, addStatusButtonContent);
+    const addModalBuilder = htmlFactory(htmlTemplates.addModal);
+    const modalTitle = "Add a column";
+    const modalLabelText = "Column name";
+    const placeholderText = "Enter a column name (To Do, in Progress, Done)";
+    const modalContent = addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId);
+    domManager.addChild(`#modalContainer`, modalContent);
+    domManager.addEventListener(`#modalInputId${boardId}`, "input", checkInput);
+    domManager.addEventListener(`#modalSubmitButton${boardId}`, "click", addColumn);
+}
+
+function addCreateCard(boardId) {
+    const addCreateCardButton = htmlFactory(htmlTemplates.addCreateCardButton);
+    const addCreateCardButtonContent = addCreateCardButton(boardId);
+    domManager.addChild(`.add-card-button-container${boardId}`, addCreateCardButtonContent);
+    domManager.addEventListener(`.board-add-new-card[data-board-id="${boardId}"]`, "click", addCardInput);
 }

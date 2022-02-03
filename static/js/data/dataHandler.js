@@ -39,16 +39,20 @@ export let dataHandler = {
   deleteBoard: async function (boardId) {
     await apiDelete(`/api/boards/${boardId}`);
   },
-  createNewCard: async function (boardId, newColumnTitle) {
+  createNewColumn: async function (boardId, newColumnTitle) {
     // creates new card, saves it and calls the callback function with its data
     const payload = {"board_id": boardId, "new_column_title": newColumnTitle};
     await apiPost(`/api/add-new-column`, payload);
   },
-  updateCards: function (payload) {
-    apiPost(`/api/update/card`, payload);
+  updateCards: async function (payload) {
+    await apiPost(`/api/update/card`, payload);
   },
   deleteCard: async function (cardId) {
     await apiDelete(`/api/cards/${cardId}`);
+  },
+  createNewCard: async function (boardId, newCardName) {
+    const payload = {"new_card_name": newCardName};
+    await apiPost(`/api/${boardId}/create-card`, payload)
   }
 
 };
