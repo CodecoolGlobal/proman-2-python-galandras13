@@ -2,7 +2,7 @@ import {dataHandler} from "../data/dataHandler.js";
 import {createNewBoardTitle, htmlFactory, htmlTemplates, newCardTitle} from "../view/htmlFactory.js";
 import {domManager} from "../view/domManager.js";
 import {reset} from "../main.js";
-import {boardsManager} from "./boardsManager.js";
+import {boardsManager, noClickEvent} from "./boardsManager.js";
 
 const ui = {
     slots: null,

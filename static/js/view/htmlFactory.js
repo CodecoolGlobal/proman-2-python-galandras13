@@ -53,11 +53,20 @@ export function createNewBoardTitle(boardId = '') {
            <button id="submit-new-board-title${boardId}">Submit</button>`
 }
 
-export function newCardTitle(boardId = "") {
+export function newColumnTitle(boardId = "", statusId="") {
     return `<input type="text" 
                     placeholder="Enter new card title" 
                     id="new-card-title-${boardId}">
             <button id="submit-new-card-${boardId}" data-board-id="${boardId}">Submit</button>`
+}
+
+export function newCardTitle(boardId = "", cardId = "") {
+    return `<input type="text" 
+                    placeholder="Enter new card title" 
+                    id="new-card-title-${boardId}"
+                    data-board-id="${boardId}"
+                    data-card-id="${cardId}"
+                    autofocus>`
 }
 
 export function createNewBoard() {

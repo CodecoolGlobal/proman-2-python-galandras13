@@ -93,12 +93,6 @@ def create_new_card(board_id):
     return jsonify_dict({'message': f" Failed to add new card: {new_card_name}."})
 
 
-
-# @app.route("/api/boards/<board_id>", methods=['DELETE'])
-# def delete_board():
-#
-
-
 @app.route('/registration', methods=['GET', 'POST'])
 def registration():
     error_message = ''
@@ -151,6 +145,14 @@ def rename_card(card_id):
     data = request.get_json()
     modified_title = data['modified_title']
     queires.rename_card(card_id, modified_title)
+    return "", 204
+
+
+@app.route('/api/columns/<status_id>', methods=['PUT'])
+def rename_column(status_id):
+    data = request.get_json()
+    modified_title = data['modified_title']
+    queires.rename_column(status_id, modified_title)
     return "", 204
 
 

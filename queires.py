@@ -201,6 +201,15 @@ def rename_card(card_id, modified_title):
         """, {"modified_title": modified_title, "card_id": card_id}, select=False)
 
 
+def rename_column(status_id, modified_title):
+    return data_manager.execute_select(
+        """
+        UPDATE statuses
+        SET title = %(modified_title)s
+        WHERE id = %(statuses_id)s
+        """, {"modified_title": modified_title, "status_id": status_id}, select=False)
+
+
 def create_card(new_card_name, board_id, status_id, card_order):
     data_manager.execute_select(
         """
