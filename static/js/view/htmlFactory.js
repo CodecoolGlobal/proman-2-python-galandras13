@@ -59,7 +59,7 @@ export function newColumnTitle(boardId = "", statusId="") {
                     placeholder="Enter new column title" 
                     id="new-column-title-${boardId}${statusId}"
                     data-board-id="${boardId}"
-                    data-card-id="${statusId}"
+                    data-status-id="${statusId}"
                     autofocus>`
 }
 

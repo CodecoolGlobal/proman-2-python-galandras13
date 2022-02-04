@@ -1,5 +1,11 @@
 import {dataHandler} from "../data/dataHandler.js";
-import {createNewBoardTitle, createNewBoard, htmlFactory, htmlTemplates} from "../view/htmlFactory.js";
+import {
+    createNewBoardTitle,
+    createNewBoard,
+    htmlFactory,
+    htmlTemplates,
+    newColumnTitle
+} from "../view/htmlFactory.js";
 import {domManager} from "../view/domManager.js";
 import {cardsManager} from "./cardsManager.js";
 import {reset} from "../main.js";
@@ -188,4 +194,47 @@ async function deleteColumn(clickEvent) {
     await boardsManager.showCards(boardId);
     await cardsManager.loadCards(boardId);
     await cardsManager.initDragAndDrop(boardId);
+}
+
+async function renameColumnHeandler(clickEvent) {
+    const statusId = clickEvent.target.dataset.statusId;
+    const boardId = clickEvent.target.dataset.boardId;
+    const renameColumnCurrentName = document.querySelector(`#columnName${statusId}`);
+    renameColumnCurrentName.classList.add("hidden");
+    const renameColumnContent = newColumnTitle(boardId, statusId);
+    domManager.addChildAfterBegin(`.board-column-title-${statusId}`, renameColumnContent);
+    domManager.addEventListener(`#new-column-title-${statusId}`, "keydown", keyDownOnRenameColumn);
+    domManager.addEventListener(`#new-column-title-${statusId}`, "click", noClickEvent);
+    domManager.addEventListener(`#new-column-title-${statusId}`, "focusout", cancelNameChange)
+    document.querySelector(`#new-column-title-${statusId}`).focus()
+}
+
+async function keyDownOnRenameColumn(e) {
+    const statusId = e.target.dataset.statusId;
+    const boardId = e.target.dataset.boardId;
+    if (e.key === 'Enter') {
+        if (e.target.value) {
+            console.log("ENTER")
+            const modifiedTitle = document.querySelector(`#new-column-title-${statusId}`).value;
+            await dataHandler.renameColumn(statusId, modifiedTitle);
+            await boardsManager.refreshBoard(boardId);
+        }
+    } else if (e.key === "Escape") {
+        console.log("ESC")
+        const inputField = document.querySelector(`#new-column-title-${statusId}`);
+        const currentColumnName = document.querySelector(`#columnName${statusId}`);
+        inputField.parentElement.removeChild(inputField);
+        currentColumnName.classList.remove("hidden");
+    }
+}
+
+async function cancelNameChange(e) {
+    const statusId = e.target.dataset.statusId;
+    const inputField = document.querySelector(`#new-column-title-${statusId}`);
+    const currentColumnName = document.querySelector(`#columnName${statusId}`);
+    console.log("cancel")
+    console.log(inputField)
+    console.log(inputField.parentElement)
+    inputField.parentElement.removeChild(inputField);
+    currentColumnName.classList.remove("hidden");
 }

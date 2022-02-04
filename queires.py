@@ -206,7 +206,7 @@ def rename_column(status_id, modified_title):
         """
         UPDATE statuses
         SET title = %(modified_title)s
-        WHERE id = %(statuses_id)s
+        WHERE id = %(status_id)s
         """, {"modified_title": modified_title, "status_id": status_id}, select=False)
 
 
