@@ -91,7 +91,7 @@ section.board {
     background: #eee;
 }
 
-.board-column-title {
+.board-column-title-container {
     text-align: center;
 }
 

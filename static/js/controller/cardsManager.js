@@ -1,7 +1,6 @@
 import {dataHandler} from "../data/dataHandler.js";
-import {createNewBoardTitle, htmlFactory, htmlTemplates, newCardTitle} from "../view/htmlFactory.js";
+import {htmlFactory, htmlTemplates, newCardTitle} from "../view/htmlFactory.js";
 import {domManager} from "../view/domManager.js";
-import {reset} from "../main.js";
 import {boardsManager, noClickEvent} from "./boardsManager.js";
 
 const ui = {
@@ -84,7 +83,7 @@ async function deleteButtonHandler(clickEvent) {
     const cardId = clickEvent.currentTarget.dataset.cardId;
     await dataHandler.deleteCard(cardId);
     await boardsManager.hideCards(boardId);
-    await boardsManager.showCards(boardId);
+    await boardsManager.showColumn(boardId);
     await cardsManager.loadCards(boardId);
     await cardsManager.initDragAndDrop(boardId);
 }
@@ -125,7 +124,7 @@ function handleDragStart(e) {
     game.dragged.classList.add("currently-dragged");
 }
 
-function handleDragEnd() {
+async function handleDragEnd() {
     game.dragged.classList.remove("currently-dragged");
     const boardId = game.dragged.dataset.boardId;
     const columns = document.querySelectorAll(`.board-column-content[data-board-id="${boardId}"]`);
@@ -140,7 +139,7 @@ function handleDragEnd() {
                 'card_order': cardOrder,
                 'status_id': statusId
             };
-            dataHandler.updateCards(payload);
+            await dataHandler.updateCards(payload);
         }
     }
     game.dragged = null;

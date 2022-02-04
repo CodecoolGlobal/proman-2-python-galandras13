@@ -11,47 +11,49 @@ import {cardsManager} from "./cardsManager.js";
 import {reset} from "../main.js";
 
 export let boardsManager = {
-  loadBoards: async function () {
-    const boards = await dataHandler.getBoards();
-    for (let board of boards) {
-      const boardBuilder = htmlFactory(htmlTemplates.board);
-      const content = boardBuilder(board);
-      domManager.addChild("#root", content);
-      domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
-      domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
-      domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard);
-    }
-  },
-  loadStatuses: async function (){
-    return await dataHandler.getStatuses()
-  },
-  createBoard: async function () {
-    domManager.addEventListener('#create-new-board', "click", createBoardHandler);
-  },
-  hideCards: async function (boardId) {
-    const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-    const modalChild = document.querySelector(`#AddColumnModal${boardId}`);
-    const createCardContainer = document.querySelector(`.add-card-button-container${boardId}`);
-    modalChild.parentElement.removeChild(modalChild);
-    statusContainer.innerHTML = "";
-    createCardContainer.innerHTML = "";
-  },
-  showCards: async function (boardId) {
-    let statuses = await boardsManager.loadStatuses();
-    for (let status of statuses) {
-        if (status.board_id === parseInt(boardId)) {
-            const statusBuilder = htmlFactory(htmlTemplates.status);
-            const content = statusBuilder(status, boardId);
-            domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
-            domManager.addEventListener(`#delete-column-button-${boardId}-${status.id}`, "click", deleteColumn)
+    loadBoards: async function () {
+        const boards = await dataHandler.getBoards();
+        for (let board of boards) {
+            const boardBuilder = htmlFactory(htmlTemplates.board);
+            const content = boardBuilder(board);
+            domManager.addChild("#root", content);
+            domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
+            domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
+            domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard);
         }
-    }
-    addCreateStatus(boardId);
-    addCreateCard(boardId);
-},
+    },
+    loadStatuses: async function () {
+        return await dataHandler.getStatuses()
+    },
+    createBoard: async function () {
+        domManager.addEventListener('#create-new-board', "click", createBoardHandler);
+    },
+    hideCards: async function (boardId) {
+        const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+        const modalChild = document.querySelector(`#AddColumnModal${boardId}`);
+        const createCardContainer = document.querySelector(`.add-card-button-container${boardId}`);
+        modalChild.parentElement.removeChild(modalChild);
+        statusContainer.innerHTML = "";
+        createCardContainer.innerHTML = "";
+    },
+    showColumn: async function (boardId) {
+        let statuses = await boardsManager.loadStatuses();
+        statuses.sort(sortByStatusId);
+        for (let status of statuses) {
+            if (status.board_id === parseInt(boardId)) {
+                const statusBuilder = htmlFactory(htmlTemplates.status);
+                const content = statusBuilder(status, boardId);
+                domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
+                domManager.addEventListener(`#delete-column-button-${boardId}-${status.id}`, "click", deleteColumn)
+                domManager.addEventListener(`#columnName${status.id}`, "click", renameColumnHeandler);
+            }
+        }
+        addCreateStatus(boardId);
+        addCreateCard(boardId);
+    },
     refreshBoard: async function (boardId) {
         await boardsManager.hideCards(boardId);
-        await boardsManager.showCards(boardId);
+        await boardsManager.showColumn(boardId);
         await cardsManager.loadCards(boardId);
         await cardsManager.initDragAndDrop(boardId);
     }
@@ -64,7 +66,7 @@ async function showHideButtonHandler(clickEvent) {
     button.classList.toggle("rotate");
     columContainer.classList.toggle("show-board-content");
     if (columContainer.classList.contains("show-board-content")) {
-        await boardsManager.showCards(boardId);
+        await boardsManager.showColumn(boardId);
         await cardsManager.loadCards(boardId);
         await cardsManager.initDragAndDrop(boardId);
     } else {
@@ -72,6 +74,15 @@ async function showHideButtonHandler(clickEvent) {
     }
 }
 
+function sortByStatusId(a, b) {
+    if (a.id < b.id) {
+        return -1;
+    }
+    if (a.id > b.id) {
+        return 1;
+    }
+    return 0;
+}
 
 function renameTable(clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
@@ -191,7 +202,7 @@ async function deleteColumn(clickEvent) {
     const statusId = clickEvent.target.dataset.statusId;
     await dataHandler.deleteColumn(boardId, statusId);
     await boardsManager.hideCards(boardId);
-    await boardsManager.showCards(boardId);
+    await boardsManager.showColumn(boardId);
     await cardsManager.loadCards(boardId);
     await cardsManager.initDragAndDrop(boardId);
 }

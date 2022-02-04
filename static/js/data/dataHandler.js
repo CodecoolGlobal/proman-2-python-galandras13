@@ -1,32 +1,26 @@
 export let dataHandler = {
   getBoards: async function () {
-    const response = await apiGet("/api/boards");
-    return response;
+    return await apiGet("/api/boards");
   },
-  getBoard: async function (boardId) {
-    // the board is retrieved and then the callback function is called with the board
-    const response = await apiGet(`/api/boards/${boardId}`);
-    return response;
-  },
+  // getBoard: async function (boardId) {
+  //   // the board is retrieved and then the callback function is called with the board
+  //   return await apiGet(`/api/boards/${boardId}`);
+  // },
   getStatuses: async function () {
     // the statuses are retrieved and then the callback function is called with the statuses
-    const response = await apiGet("/api/statuses/");
-    return response;
+    return await apiGet("/api/statuses/");
   },
-  getStatus: async function (statusId) {
-    // the status is retrieved and then the callback function is called with the status
-    const response = await apiGet(`/api/statuses/${statusId}`);
-    return response;
-  },
+  // getStatus: async function (statusId) {
+  //   // the status is retrieved and then the callback function is called with the status
+  //   return await apiGet(`/api/statuses/${statusId}`);
+  // },
   getCardsByBoardId: async function (boardId) {
-    const response = await apiGet(`/api/boards/${boardId}/cards/`);
-    return response;
+    return await apiGet(`/api/boards/${boardId}/cards/`);
   },
-  getCard: async function (cardId) {
-    // the card is retrieved and then the callback function is called with the card
-    const response = await apiGet(`/api/cards/${cardId}`);
-    return response;
-  },
+  // getCard: async function (cardId) {
+  //   // the card is retrieved and then the callback function is called with the card
+  //   return await apiGet(`/api/cards/${cardId}`);
+  // },
   createNewBoard: async function (boardTitle, userId) {
     // creates new board, saves it and calls the callback function with its data
     const payload = {"board_title": boardTitle, "user_id": userId}
@@ -44,8 +38,8 @@ export let dataHandler = {
     const payload = {"board_id": boardId, "new_column_title": newColumnTitle};
     await apiPost(`/api/add-new-column`, payload);
   },
-  updateCards: function (payload) {
-    apiPost(`/api/update/card`, payload);
+  updateCards: async function (payload) {
+    await apiPost(`/api/update/card`, payload);
   },
   deleteCard: async function (cardId) {
     await apiDelete(`/api/cards/${cardId}`);
@@ -63,7 +57,7 @@ export let dataHandler = {
   },
   renameColumn: async function(statusId, modifiedTitle = null) {
     const payload = {"modified_title": modifiedTitle}
-    await apiPut(`/api/columns/${statusId}`)
+    await apiPut(`/api/columns/${statusId}`, payload)
   }
 };
 
@@ -72,8 +66,7 @@ async function apiGet(url) {
     method: "GET",
   });
   if (response.status === 200) {
-    let data = response.json();
-    return data;
+    return response.json();
   }
 }
 

@@ -57,7 +57,7 @@ export function createNewBoardTitle(boardId = '') {
 export function newColumnTitle(boardId = "", statusId="") {
     return `<input type="text" 
                     placeholder="Enter new column title" 
-                    id="new-column-title-${boardId}${statusId}"
+                    id="new-column-title-${statusId}"
                     data-board-id="${boardId}"
                     data-status-id="${statusId}"
                     autofocus>`
@@ -88,8 +88,9 @@ function cardBuilder(card) {
 
 function statusBuilder(status, boardId){
     return`<div class="board-column">
-                <div class="board-column-title"><span>${status.title}</span>
-                <span class="delete-column-button"><i class="fas fa-trash-alt pointer" id="delete-column-button-${boardId}-${status.id}" data-board-id=${boardId} data-status-id=${status.id}></i></span>
+                <div class="board-column-title-${status.id} board-column-title-container">
+                    <span id="columnName${status.id}" data-status-id="${status.id}" data-board-id="${boardId}">${status.title}</span>
+                    <span class="delete-column-button"><i class="fas fa-trash-alt pointer" id="delete-column-button-${boardId}-${status.id}" data-board-id=${boardId} data-status-id=${status.id}></i></span>
                 </div>
                 <div class="board-column-content" data-status-id="${status.id}" data-board-id="${boardId}">
                 </div>
