@@ -1,17 +1,10 @@
 import { boardsManager } from "./controller/boardsManager.js";
-
-let socket;
+import { websocketManager } from "./controller/websocketManager.js";
 
 async function init () {
   await boardsManager.loadBoards();
   await boardsManager.createBoard();
-
-  if (socket == null) {
-    socket = io();
-    socket.on('connect', function () {
-      socket.emit('my event', { data: 'I\'m connected!' });
-    });
-  }
+  websocketManager.init();
 }
 
 export async function reset () {

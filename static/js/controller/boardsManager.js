@@ -9,6 +9,7 @@ import {
 import {domManager} from "../view/domManager.js";
 import {cardsManager} from "./cardsManager.js";
 import {reset} from "../main.js";
+import { websocketManager } from "./websocketManager.js";
 
 export let boardsManager = {
     loadBoards: async function () {
@@ -115,6 +116,7 @@ async function addCard(clickEvent) {
     const createCardInputField = document.querySelector(`#new-card-input-field${boardId}`);
     const newCardName = createCardInputField.value;
     await dataHandler.createNewCard(boardId, newCardName);
+    websocketManager.sendNewCard(boardId, newCardName);
     await boardsManager.refreshBoard(boardId);
 }
 

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect, session
 from dotenv import load_dotenv
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
 
 from util import json_response, hash_password, check_password, jsonify_dict
 import mimetypes
@@ -187,12 +187,17 @@ def add_new_column():
 
 
 @socketio.on('my event')
-def handle_my_custom_event(json):
+def handle_socketio_my_custom_event(json):
     print('received json: ' + str(json))
 
 
+@socketio.on('create_card')
+def handle_socketio_create_card(card):
+    emit('something_happened', {'boardId': card['data']['boardId']}, broadcast=True)
+
+
 def main():
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, port=5001)
 
     # Serving the favicon
     with app.app_context():
