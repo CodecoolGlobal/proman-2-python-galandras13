@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect, session
 from dotenv import load_dotenv
+from flask_socketio import SocketIO
 
 from util import json_response, hash_password, check_password, jsonify_dict
 import mimetypes
@@ -9,6 +10,7 @@ mimetypes.add_type('application/javascript', '.js')
 app = Flask(__name__)
 load_dotenv()
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+socketio = SocketIO(app)
 
 
 @app.route("/")
@@ -185,7 +187,7 @@ def add_new_column():
 
 
 def main():
-    app.run(debug=True)
+    socketio.run(app, debug=True)
 
     # Serving the favicon
     with app.app_context():
