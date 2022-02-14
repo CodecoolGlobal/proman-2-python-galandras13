@@ -1,0 +1,17 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# 4 space indentation
+[*.py]
+indent_style = space
+indent_size = 4
+
+# Indentation override for all JS under lib directory
+[**.js]
+indent_style = space
+indent_size = 2
+ij_javascript_space_before_method_parentheses = true
+ij_javascript_spaces_within_object_literal_braces = true
+ij_javascript_spaces_within_imports = true
