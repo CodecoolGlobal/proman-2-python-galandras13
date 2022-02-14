@@ -1,12 +1,14 @@
-import { dom } from "./dom.js";
+import { boardsManager } from "./controller/boardsManager.js";
 
-// This function is to initialize the application
 function init() {
-    // init data
-    dom.init();
-    // loads the boards to the screen
-    dom.loadBoards();
+  boardsManager.loadBoards();
+  boardsManager.createBoard();
+}
 
+export async function reset () {
+  const root = document.querySelector('#root')
+  root.innerHTML = ''
+  await init()
 }
 
 init();

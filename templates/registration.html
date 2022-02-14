@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/login_and_register.css">
+</head>
+<body>
+    <div class="container"></div>
+        <div class="message">
+            {% if message != '' %}
+                <span>{{ message }}</span>
+            {% endif %}
+        </div>
+    <form action="#" class="form" method="post">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" placeholder="username">
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" placeholder="password">
+        </div>
+        <div>
+            <button type="submit" id="submit">Register</button>
+    </form>
+
+</body>
+</html>
