@@ -1,8 +1,17 @@
 import { boardsManager } from "./controller/boardsManager.js";
 
-function init() {
-  boardsManager.loadBoards();
-  boardsManager.createBoard();
+let socket;
+
+async function init () {
+  await boardsManager.loadBoards();
+  await boardsManager.createBoard();
+
+  if (socket == null) {
+    socket = io();
+    socket.on('connect', function () {
+      socket.emit('my event', { data: 'I\'m connected!' });
+    });
+  }
 }
 
 export async function reset () {
@@ -11,4 +20,4 @@ export async function reset () {
   await init()
 }
 
-init();
+await init();

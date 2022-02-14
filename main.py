@@ -186,6 +186,11 @@ def add_new_column():
     return jsonify_dict({'message': f" Failed to add new column in board with id:{board_id}."})
 
 
+@socketio.on('my event')
+def handle_my_custom_event(json):
+    print('received json: ' + str(json))
+
+
 def main():
     socketio.run(app, debug=True)
 
