@@ -186,8 +186,8 @@ def add_new_column():
 
 @app.route("/api/get-archived")
 @json_response
-def get_archived():
-    return queires.get_archived()
+def get_archived(board_id):
+    return queires.get_archived(board_id)
 
 
 @app.route("/api/cards/archive/<card_id>", methods=['PUT'])
