@@ -2,29 +2,24 @@ export let dataHandler = {
     getBoards: async function () {
         return await apiGet("/api/boards");
     },
-    // getBoard: async function (boardId) {
-    //   // the board is retrieved and then the callback function is called with the board
-    //   return await apiGet(`/api/boards/${boardId}`);
-    // },
+    getBoard: async function (boardId) {
+        return await apiGet(`/api/boards/${boardId}`);
+    },
     getStatuses: async function () {
-        // the statuses are retrieved and then the callback function is called with the statuses
         return await apiGet("/api/statuses/");
     },
-    // getStatus: async function (statusId) {
-    //   // the status is retrieved and then the callback function is called with the status
-    //   return await apiGet(`/api/statuses/${statusId}`);
-    // },
+    getStatus: async function (statusId) {
+        return await apiGet(`/api/statuses/${statusId}`);
+    },
     getCardsByBoardId: async function (boardId) {
         return await apiGet(`/api/boards/${boardId}/cards/`);
     },
-    // getCard: async function (cardId) {
-    //   // the card is retrieved and then the callback function is called with the card
-    //   return await apiGet(`/api/cards/${cardId}`);
-    // },
+    getCard: async function (cardId) {
+        return await apiGet(`/api/cards/${cardId}`);
+    },
     createNewBoard: async function (boardTitle, userId) {
-        // creates new board, saves it and calls the callback function with its data
-        const payload = { "board_title": boardTitle, "user_id": userId }
-        await apiPost('/api/newBoards', payload)
+        const payload = { "board_title": boardTitle, "user_id": userId };
+        await apiPost('/api/newBoards', payload);
     },
     updateBoardTitle: async function (boardId, updatedBoardTitle) {
         const payload = { "new_title": updatedBoardTitle };
@@ -34,7 +29,6 @@ export let dataHandler = {
         await apiDelete(`/api/boards/${boardId}`);
     },
     createNewColumn: async function (boardId, newColumnTitle) {
-        // creates new card, saves it and calls the callback function with its data
         const payload = { "board_id": boardId, "new_column_title": newColumnTitle };
         await apiPost(`/api/add-new-column`, payload);
     },
@@ -49,22 +43,22 @@ export let dataHandler = {
     },
     createNewCard: async function (boardId, newCardName) {
         const payload = { "new_card_name": newCardName };
-        await apiPost(`/api/${boardId}/create-card`, payload)
+        await apiPost(`/api/${boardId}/create-card`, payload);
     },
     renameCard: async function (cardId, modifiedTitle = null) {
-        const payload = { "modified_title": modifiedTitle }
-        await apiPut(`/api/cards/${cardId}`, payload)
+        const payload = { "modified_title": modifiedTitle };
+        await apiPut(`/api/cards/${cardId}`, payload);
     },
     renameColumn: async function (statusId, modifiedTitle = null) {
-        const payload = { "modified_title": modifiedTitle }
-        await apiPut(`/api/columns/${statusId}`, payload)
+        const payload = { "modified_title": modifiedTitle };
+        await apiPut(`/api/columns/${statusId}`, payload);
     },
     getArchived: async function (boardId) {
-        return await apiGet(`/api/get-archived/${boardId}`)
+        return await apiGet(`/api/get-archived/${boardId}`);
     },
     updateArchives: async function (cardId, archived) {
-        const payload = { "archive": !archived }
-        await apiPut(`/api/cards/archive/${cardId}`, payload)
+        const payload = { "archive": !archived };
+        await apiPut(`/api/cards/archive/${cardId}`, payload);
     }
 };
 
