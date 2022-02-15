@@ -242,3 +242,21 @@ def get_card_order_by_status_id(status_id):
             WHERE status_id = %(status_id)s;
             """, {'status_id': status_id}, fetchall=False
     )
+
+
+def update_archives(card_id, archive):
+    data_manager.execute_select(
+        """
+        UPDATE cards
+        SET archived = %(archive)s
+        WHERE id = %(card_id)s
+        """, {"archive": archive, "card_id": card_id}, select=False)
+
+
+def get_archived(board_id):
+    return data_manager.execute_select(
+        """
+        SELECT *
+        FROM cards
+        WHERE cards.archived = TRUE AND cards.board_id = %(board_id)s
+        """, {'board_id': board_id})

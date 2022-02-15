@@ -1,7 +1,7 @@
-import {dataHandler} from "../data/dataHandler.js";
-import {htmlFactory, htmlTemplates, newCardTitle} from "../view/htmlFactory.js";
-import {domManager} from "../view/domManager.js";
-import {boardsManager, noClickEvent} from "./boardsManager.js";
+import { dataHandler } from "../data/dataHandler.js";
+import { htmlFactory, htmlTemplates, newCardTitle } from "../view/htmlFactory.js";
+import { domManager } from "../view/domManager.js";
+import { boardsManager, noClickEvent } from "./boardsManager.js";
 
 const ui = {
     slots: null,
@@ -17,11 +17,17 @@ export let cardsManager = {
         const cards = await dataHandler.getCardsByBoardId(boardId);
         cards.sort(sortByCardOrder);
         for (let card of cards) {
-            const cardBuilder = htmlFactory(htmlTemplates.card);
-            const content = cardBuilder(card);
-            domManager.addChild(`.board-column-content[data-status-id="${card.status_id}"][data-board-id="${boardId}"]`, content);
-            domManager.addEventListener(`.card-remove[data-card-id="${card.id}"]`, "click", deleteButtonHandler);
-            domManager.addEventListener(`.cardName[data-card-id="${card.id}"][data-board-id="${card.board_id}"]`, "click", renameCard);
+            if (!card.archived) {
+                const cardBuilder = htmlFactory(htmlTemplates.card);
+                const content = cardBuilder(card);
+                domManager.addChild(`.board-column-content[data-status-id="${card.status_id}"][data-board-id="${boardId}"]`, content);
+                domManager.addEventListener(`.card-remove[data-card-id="${card.id}"]`, "click", deleteButtonHandler);
+                domManager.addEventListener(`.cardName[data-card-id="${card.id}"][data-board-id="${card.board_id}"]`, "click", renameCard);
+                domManager.addEventListener(`.archive-add[data-card-id="${card.id}"]`, "click", addToArchiveHandler);
+            } else {
+                const showArchivedButton = document.querySelector(`.show-archive[data-board-id="${boardId}"]`);
+                showArchivedButton.removeAttribute("hidden");
+            }
         }
     }, initDragAndDrop: async function (boardId) {
         await initElements(boardId);
@@ -29,7 +35,7 @@ export let cardsManager = {
     }
 };
 
-async function renameCard(clickEvent) {
+async function renameCard (clickEvent) {
     const cardId = clickEvent.target.dataset.cardId;
     const boardId = clickEvent.target.dataset.boardId;
     const renameCardCurrentName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
@@ -38,11 +44,11 @@ async function renameCard(clickEvent) {
     domManager.addChildAfterBegin(`.card[data-card-id="${cardId}"]`, renameCardContent);
     domManager.addEventListener(`#new-card-title-${boardId}`, "keydown", keyDownOnRenameCard);
     domManager.addEventListener(`#new-card-title-${boardId}`, "click", noClickEvent);
-    domManager.addEventListener(`#new-card-title-${boardId}`, "focusout", cancelNameChange)
-    document.querySelector(`#new-card-title-${boardId}`).focus()
+    domManager.addEventListener(`#new-card-title-${boardId}`, "focusout", cancelNameChange);
+    document.querySelector(`#new-card-title-${boardId}`).focus();
 }
 
-async function keyDownOnRenameCard(e) {
+async function keyDownOnRenameCard (e) {
     const cardId = e.target.dataset.cardId;
     const boardId = e.target.dataset.boardId;
     if (e.key === 'Enter') {
@@ -53,22 +59,22 @@ async function keyDownOnRenameCard(e) {
         }
     } else if (e.key === "Escape") {
         const inputField = document.querySelector(`#new-card-title-${boardId}`);
-        const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`)
+        const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
         inputField.parentElement.removeChild(inputField);
         currentCardName.classList.remove("hidden");
     }
 }
 
-async function cancelNameChange(e) {
+async function cancelNameChange (e) {
     const cardId = e.target.dataset.cardId;
     const boardId = e.target.dataset.boardId;
     const inputField = document.querySelector(`#new-card-title-${boardId}`);
-    const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`)
+    const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
     inputField.parentElement.removeChild(inputField);
     currentCardName.classList.remove("hidden");
 }
 
-function sortByCardOrder(a, b) {
+function sortByCardOrder (a, b) {
     if (a.card_order < b.card_order) {
         return -1;
     }
@@ -78,7 +84,7 @@ function sortByCardOrder(a, b) {
     return 0;
 }
 
-async function deleteButtonHandler(clickEvent) {
+async function deleteButtonHandler (clickEvent) {
     const boardId = clickEvent.currentTarget.dataset.boardId;
     const cardId = clickEvent.currentTarget.dataset.cardId;
     await dataHandler.deleteCard(cardId);
@@ -88,7 +94,17 @@ async function deleteButtonHandler(clickEvent) {
     await cardsManager.initDragAndDrop(boardId);
 }
 
-function initElements(boardId) {
+let addToArchiveHandler = async (event) => {
+    const cardId = event.currentTarget.dataset.cardId;
+    const boardId = event.currentTarget.dataset.boardId;
+    const card = document.querySelector(`.card[data-card-id="${cardId}"]`);
+    card.setAttribute("hidden", "");
+    await dataHandler.updateArchives(cardId, false);
+    const showArchivedButton = document.querySelector(`.show-archive[data-board-id="${boardId}"]`);
+    showArchivedButton.removeAttribute("hidden");
+}
+
+function initElements (boardId) {
     ui.cards = document.querySelectorAll(`.card[data-board-id="${boardId}"]`);
     ui.slots = document.querySelectorAll(`.board-column-content[data-board-id="${boardId}"]`);
 
@@ -97,7 +113,7 @@ function initElements(boardId) {
     });
 }
 
-function initDragEvents() {
+function initDragEvents () {
     ui.cards.forEach(function (card) {
         initDraggable(card);
     });
@@ -107,24 +123,24 @@ function initDragEvents() {
     });
 }
 
-function initDraggable(draggable) {
+function initDraggable (draggable) {
     draggable.addEventListener("dragstart", handleDragStart);
     draggable.addEventListener("dragend", handleDragEnd);
 }
 
-function initDropzone(dropzone) {
+function initDropzone (dropzone) {
     dropzone.addEventListener("dragenter", handleDragEnter);
     dropzone.addEventListener("dragover", handleDragOver);
     dropzone.addEventListener("dragleave", handleDragLeave);
     dropzone.addEventListener("drop", handleDrop);
 }
 
-function handleDragStart(e) {
+function handleDragStart (e) {
     game.dragged = e.currentTarget;
     game.dragged.classList.add("currently-dragged");
 }
 
-async function handleDragEnd() {
+async function handleDragEnd () {
     game.dragged.classList.remove("currently-dragged");
     const boardId = game.dragged.dataset.boardId;
     const columns = document.querySelectorAll(`.board-column-content[data-board-id="${boardId}"]`);
@@ -145,7 +161,7 @@ async function handleDragEnd() {
     game.dragged = null;
 }
 
-function handleDragEnter(e) {
+function handleDragEnter (e) {
     ui.slots.forEach(function (slots) {
         slots.classList.remove("highlighted-slots");
     });
@@ -156,7 +172,7 @@ function handleDragEnter(e) {
     }
 }
 
-function handleDragOver(e) {
+function handleDragOver (e) {
     e.preventDefault();
     const dropzone = e.currentTarget;
     const afterElement = getDragAfterElement(dropzone, e.clientY);
@@ -170,7 +186,7 @@ function handleDragOver(e) {
     }
 }
 
-function handleDragLeave(e) {
+function handleDragLeave (e) {
     e.currentTarget.classList.remove("highlighted-slots");
     e.currentTarget.classList.remove("highlighted-good-slots");
     e.currentTarget.classList.remove("highlighted-bad-slots");
@@ -180,20 +196,20 @@ function handleDragLeave(e) {
     });
 }
 
-function handleDrop(e) {
+function handleDrop (e) {
     e.preventDefault();
 }
 
-function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.card:not(.currently-dragged)')]
+function getDragAfterElement (container, y) {
+    const draggableElements = [...container.querySelectorAll('.card:not(.currently-dragged)')];
 
     return draggableElements.reduce((closest, child) => {
         const box = child.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
         if (offset < 0 && offset > closest.offset) {
-            return {offset: offset, element: child}
+            return { offset: offset, element: child };
         } else {
             return closest;
         }
-    }, {offset: Number.NEGATIVE_INFINITY}).element
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
 }

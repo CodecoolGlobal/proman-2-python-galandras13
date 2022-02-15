@@ -43,7 +43,8 @@ CREATE TABLE cards (
     board_id    INTEGER             NOT NULL,
     status_id   INTEGER             NOT NULL,
     title       VARCHAR (200)       NOT NULL,
-    card_order  INTEGER             NOT NULL
+    card_order  INTEGER             NOT NULL,
+    archived    BOOLEAN             DEFAULT FALSE
 );
 
 CREATE TABLE users (
