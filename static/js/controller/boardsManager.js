@@ -24,7 +24,7 @@ export let boardsManager = {
         }
     },
     loadStatuses: async function () {
-        return await dataHandler.getStatuses()
+        return await dataHandler.getStatuses();
     },
     createBoard: async function () {
         domManager.addEventListener('#create-new-board', "click", createBoardHandler);
@@ -132,13 +132,13 @@ function sortByStatusId (a, b) {
 
 function renameTable (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
-    const selectorString = `.board-title[data-board-id="${boardId}"]`
-    const rename = document.querySelector(selectorString)
-    rename.innerHTML = createNewBoardTitle(boardId)
+    const selectorString = `.board-title[data-board-id="${boardId}"]`;
+    const rename = document.querySelector(selectorString);
+    rename.innerHTML = createNewBoardTitle(boardId);
     domManager.addEventListener(`#submit-new-board-title-${boardId}`, 'click', async () => {
-        const updatedBoardTitle = document.querySelector(`#new-board-title-${boardId}`).value
-        await dataHandler.updateBoardTitle(boardId, updatedBoardTitle)
-        await reset()
+        const updatedBoardTitle = document.querySelector(`#new-board-title-${boardId}`).value;
+        await dataHandler.updateBoardTitle(boardId, updatedBoardTitle);
+        await reset();
     })
 }
 
@@ -217,7 +217,7 @@ function hideForm (createButton, inputField, submitButton) {
 
 function addCreateStatus (boardId, deleteModals) {
     const addStatusButton = htmlFactory(htmlTemplates.addStatusButton);
-    const addStatusButtonContent = addStatusButton(boardId)
+    const addStatusButtonContent = addStatusButton(boardId);
     domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, addStatusButtonContent);
     if (deleteModals) {
         const addModalBuilder = htmlFactory(htmlTemplates.addModal);
@@ -267,8 +267,8 @@ async function renameColumnHandler (clickEvent) {
     domManager.addChildAfterBegin(`.board-column-title-${statusId}`, renameColumnContent);
     domManager.addEventListener(`#new-column-title-${statusId}`, "keydown", keyDownOnRenameColumn);
     domManager.addEventListener(`#new-column-title-${statusId}`, "click", noClickEvent);
-    domManager.addEventListener(`#new-column-title-${statusId}`, "focusout", cancelNameChange)
-    document.querySelector(`#new-column-title-${statusId}`).focus()
+    domManager.addEventListener(`#new-column-title-${statusId}`, "focusout", cancelNameChange);
+    document.querySelector(`#new-column-title-${statusId}`).focus();
 }
 
 async function keyDownOnRenameColumn (e) {
@@ -276,13 +276,11 @@ async function keyDownOnRenameColumn (e) {
     const boardId = e.target.dataset.boardId;
     if (e.key === 'Enter') {
         if (e.target.value) {
-            console.log("ENTER")
             const modifiedTitle = document.querySelector(`#new-column-title-${statusId}`).value;
             await dataHandler.renameColumn(statusId, modifiedTitle);
             await boardsManager.refreshBoard(boardId);
         }
     } else if (e.key === "Escape") {
-        console.log("ESC")
         const inputField = document.querySelector(`#new-column-title-${statusId}`);
         const currentColumnName = document.querySelector(`#columnName${statusId}`);
         inputField.parentElement.removeChild(inputField);
@@ -294,9 +292,6 @@ async function cancelNameChange (e) {
     const statusId = e.target.dataset.statusId;
     const inputField = document.querySelector(`#new-column-title-${statusId}`);
     const currentColumnName = document.querySelector(`#columnName${statusId}`);
-    console.log("cancel")
-    console.log(inputField)
-    console.log(inputField.parentElement)
     inputField.parentElement.removeChild(inputField);
     currentColumnName.classList.remove("hidden");
 }

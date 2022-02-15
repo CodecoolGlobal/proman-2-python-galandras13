@@ -58,16 +58,16 @@ function boardBuilder (board) {
                 </div>
                 <div class="board-columns" data-board-id="${board.id}">
                 </div>
-            </section>`
+            </section>`;
 }
 
 export function createNewBoardTitle (boardId = '') {
-    boardId = boardId ? `-${boardId}` : ""
+    boardId = boardId ? `-${boardId}` : "";
     return `<input type="text" 
                     placeholder="Board Title" 
                     id="new-board-title${boardId}"
                     autofocus>
-           <button id="submit-new-board-title${boardId}">Submit</button>`
+           <button id="submit-new-board-title${boardId}">Submit</button>`;
 }
 
 export function newColumnTitle (boardId = "", statusId = "") {
@@ -76,7 +76,7 @@ export function newColumnTitle (boardId = "", statusId = "") {
                     id="new-column-title-${statusId}"
                     data-board-id="${boardId}"
                     data-status-id="${statusId}"
-                    autofocus>`
+                    autofocus>`;
 }
 
 export function newCardTitle (boardId = "", cardId = "") {
@@ -85,12 +85,12 @@ export function newCardTitle (boardId = "", cardId = "") {
                     id="new-card-title-${boardId}"
                     data-board-id="${boardId}"
                     data-card-id="${cardId}"
-                    autofocus>`
+                    autofocus>`;
 }
 
 export function createNewBoard () {
     return `<input type="text" placeholder="Board Title" id="new-board-input-field" autofocus>
-           <button id="new-board">Save</button>`
+           <button id="new-board">Save</button>`;
 }
 
 function cardBuilder (card) {
@@ -115,14 +115,14 @@ function statusBuilder (status, boardId) {
                 </div>
                 <div class="board-column-content" data-status-id="${status.id}" data-board-id="${boardId}">
                 </div>
-           </div>`
+           </div>`;
 }
 
 function addStatusBuilder (boardId) {
     return `<div class="add-column-board-column">
                 <button type="button" class="add-column btn btn-info btn-lg" data-board-id="${boardId}" data-toggle="modal" data-target="#AddColumnModal${boardId}">+ Add column</button>
                 </div>
-            </div>`
+            </div>`;
 }
 
 function addModalBuilder (modalTitle, type, boardId = null) {
@@ -153,20 +153,20 @@ function addModalBuilder (modalTitle, type, boardId = null) {
 const addModalColumnBodyBuilder = (boardId, modalLabelText, placeholderText) => {
     return `<label for="modalInputId${boardId}">${modalLabelText}</label>
             <input type="text" id="modalInputId${boardId}" placeholder="${placeholderText}" minLength="1" data-board-id="${boardId}"
-               required autoFocus>`
+               required autoFocus>`;
 }
 
 const addModalArchiveBodyBuilder = (boardId) => {
-    return `<ul class="archived-cards-${boardId}"></ul>`
+    return `<ul class="archived-cards-${boardId}"></ul>`;
 }
 
 function addCreateCardBuilder (boardId) {
-    return `<button class="board-add-new-card" data-board-id="${boardId}">Create new card</button>`
+    return `<button class="board-add-new-card" data-board-id="${boardId}">Create new card</button>`;
 }
 
 export function createNewCardInputBuilder (boardId) {
     return `<input type="text" placeholder="Card name" id="new-card-input-field${boardId}" data-board-id="${boardId}" autofocus>
-           <button id="new-card${boardId}" class="" data-board-id="${boardId}" disabled>Save</button>`
+           <button id="new-card${boardId}" class="" data-board-id="${boardId}" disabled>Save</button>`;
 }
 
 const addModalArchiveCardBuilder = (archivedCard) => {
@@ -174,5 +174,5 @@ const addModalArchiveCardBuilder = (archivedCard) => {
                     <span class="archived-cardName" data-card-id="${archivedCard.id}" data-board-id="${archivedCard.board_id}">${archivedCard.title}</span>
                     <i class="un-archive fas fa-archive" data-card-id="${archivedCard.id}" data-board-id="${archivedCard.board_id}"></i>
                 </div>
-            </div></li>`
+            </div></li>`;
 }

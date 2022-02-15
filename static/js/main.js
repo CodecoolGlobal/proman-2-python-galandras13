@@ -6,9 +6,9 @@ function init () {
 }
 
 export async function reset () {
-    const root = document.querySelector('#root')
-    root.innerHTML = ''
-    await init()
+    const root = document.querySelector('#root');
+    root.innerHTML = '';
+    await init();
 }
 
 init();

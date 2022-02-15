@@ -44,8 +44,8 @@ async function renameCard (clickEvent) {
     domManager.addChildAfterBegin(`.card[data-card-id="${cardId}"]`, renameCardContent);
     domManager.addEventListener(`#new-card-title-${boardId}`, "keydown", keyDownOnRenameCard);
     domManager.addEventListener(`#new-card-title-${boardId}`, "click", noClickEvent);
-    domManager.addEventListener(`#new-card-title-${boardId}`, "focusout", cancelNameChange)
-    document.querySelector(`#new-card-title-${boardId}`).focus()
+    domManager.addEventListener(`#new-card-title-${boardId}`, "focusout", cancelNameChange);
+    document.querySelector(`#new-card-title-${boardId}`).focus();
 }
 
 async function keyDownOnRenameCard (e) {
@@ -59,7 +59,7 @@ async function keyDownOnRenameCard (e) {
         }
     } else if (e.key === "Escape") {
         const inputField = document.querySelector(`#new-card-title-${boardId}`);
-        const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`)
+        const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
         inputField.parentElement.removeChild(inputField);
         currentCardName.classList.remove("hidden");
     }
@@ -69,7 +69,7 @@ async function cancelNameChange (e) {
     const cardId = e.target.dataset.cardId;
     const boardId = e.target.dataset.boardId;
     const inputField = document.querySelector(`#new-card-title-${boardId}`);
-    const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`)
+    const currentCardName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
     inputField.parentElement.removeChild(inputField);
     currentCardName.classList.remove("hidden");
 }
@@ -201,15 +201,15 @@ function handleDrop (e) {
 }
 
 function getDragAfterElement (container, y) {
-    const draggableElements = [...container.querySelectorAll('.card:not(.currently-dragged)')]
+    const draggableElements = [...container.querySelectorAll('.card:not(.currently-dragged)')];
 
     return draggableElements.reduce((closest, child) => {
         const box = child.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
         if (offset < 0 && offset > closest.offset) {
-            return { offset: offset, element: child }
+            return { offset: offset, element: child };
         } else {
             return closest;
         }
-    }, { offset: Number.NEGATIVE_INFINITY }).element
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
