@@ -59,9 +59,8 @@ export let dataHandler = {
         const payload = { "modified_title": modifiedTitle }
         await apiPut(`/api/columns/${statusId}`, payload)
     },
-    getArchived: async function () {
-        let response = await apiGet(`/api/get-archived`)
-        return response
+    getArchived: async function (boardId) {
+        return await apiGet(`/api/get-archived/${boardId}`)
     },
     updateArchives: async function (cardId, archived) {
         const payload = { "archive": !archived }

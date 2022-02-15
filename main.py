@@ -184,7 +184,7 @@ def add_new_column():
     return jsonify_dict({'message': f" Failed to add new column in board with id:{board_id}."})
 
 
-@app.route("/api/get-archived")
+@app.route("/api/get-archived/<board_id>")
 @json_response
 def get_archived(board_id):
     return queires.get_archived(board_id)

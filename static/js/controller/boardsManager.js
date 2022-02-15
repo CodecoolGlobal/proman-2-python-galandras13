@@ -1,4 +1,4 @@
-import {dataHandler} from "../data/dataHandler.js";
+import { dataHandler } from "../data/dataHandler.js";
 import {
     createNewBoardTitle,
     createNewBoard,
@@ -6,9 +6,9 @@ import {
     htmlTemplates,
     newColumnTitle
 } from "../view/htmlFactory.js";
-import {domManager} from "../view/domManager.js";
-import {cardsManager} from "./cardsManager.js";
-import {reset} from "../main.js";
+import { domManager } from "../view/domManager.js";
+import { cardsManager } from "./cardsManager.js";
+import { reset } from "../main.js";
 
 export let boardsManager = {
     loadBoards: async function () {
@@ -20,7 +20,7 @@ export let boardsManager = {
             domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
             domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
             domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard);
-            domManager.addEventListener(`.show-archive[data-board-id="${board.id}"]`, "click", openArchivedHandler);
+            domManager.addEventListener(`.show-archive[data-board-id="${board.id}"]`, "click", showArchivesModalHandler);
         }
     },
     loadStatuses: async function () {
@@ -29,19 +29,21 @@ export let boardsManager = {
     createBoard: async function () {
         domManager.addEventListener('#create-new-board', "click", createBoardHandler);
     },
-    hideCards: async function (boardId) {
+    hideCards: async function (boardId, deleteModals) {
         const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
         const columnModalChild = document.querySelector(`#AddColumnModal${boardId}`);
         const archivesModalChild = document.querySelector(`#AddArchiveModal${boardId}`);
         const createCardContainer = document.querySelector(`.add-card-button-container${boardId}`);
         const showArchivedButton = document.querySelector(`.show-archive[data-board-id="${boardId}"]`);
         showArchivedButton.setAttribute("hidden", "");
-        columnModalChild.parentElement.removeChild(columnModalChild);
-        archivesModalChild.parentElement.removeChild(archivesModalChild);
+        if (deleteModals) {
+            columnModalChild.parentElement.removeChild(columnModalChild);
+            archivesModalChild.parentElement.removeChild(archivesModalChild);
+        }
         statusContainer.innerHTML = "";
         createCardContainer.innerHTML = "";
     },
-    showColumn: async function (boardId) {
+    showColumn: async function (boardId, deleteModals = true) {
         let statuses = await boardsManager.loadStatuses();
         statuses.sort(sortByStatusId);
         for (let status of statuses) {
@@ -49,38 +51,42 @@ export let boardsManager = {
                 const statusBuilder = htmlFactory(htmlTemplates.status);
                 const content = statusBuilder(status, boardId);
                 domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
-                domManager.addEventListener(`#delete-column-button-${boardId}-${status.id}`, "click", deleteColumn)
+                domManager.addEventListener(`#delete-column-button-${boardId}-${status.id}`, "click", deleteColumn);
                 domManager.addEventListener(`#columnName${status.id}`, "click", renameColumnHandler);
             }
         }
-        addCreateStatus(boardId);
-        addCreateCard(boardId);
-        addShowArchives(boardId);
+        addCreateStatus(boardId, deleteModals);
+        addCreateCard(boardId, deleteModals);
+        if (deleteModals) {
+            await addShowArchivesModal(boardId);
+        }
     },
-    refreshBoard: async function (boardId) {
-        await boardsManager.hideCards(boardId);
-        await boardsManager.showColumn(boardId);
+    refreshBoard: async function (boardId, deleteModals = true) {
+        await boardsManager.hideCards(boardId, deleteModals);
+        await boardsManager.showColumn(boardId, deleteModals);
         await cardsManager.loadCards(boardId);
         await cardsManager.initDragAndDrop(boardId);
     }
 };
 
-async function showHideButtonHandler(clickEvent) {
-    const boardId = clickEvent.target.dataset.boardId;
-    const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-    const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
-    button.classList.toggle("rotate");
-    columContainer.classList.toggle("show-board-content");
-    if (columContainer.classList.contains("show-board-content")) {
-        await boardsManager.showColumn(boardId);
-        await cardsManager.loadCards(boardId);
-        await cardsManager.initDragAndDrop(boardId);
-    } else {
-        await boardsManager.hideCards(boardId);
+async function showHideButtonHandler (clickEvent) {
+    if (clickEvent.target === clickEvent.currentTarget || clickEvent.target.classList.contains("fa-chevron-down")) {
+        const boardId = clickEvent.target.dataset.boardId;
+        const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+        const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
+        button.classList.toggle("rotate");
+        columContainer.classList.toggle("show-board-content");
+        if (columContainer.classList.contains("show-board-content")) {
+            await boardsManager.showColumn(boardId);
+            await cardsManager.loadCards(boardId);
+            await cardsManager.initDragAndDrop(boardId);
+        } else {
+            await boardsManager.hideCards(boardId);
+        }
     }
 }
 
-const addShowArchives = (boardId) => {
+const addShowArchivesModal = async (boardId) => {
     const modalTitle = "Archived cards";
     const addModalBuilder = htmlFactory(htmlTemplates.addModal);
     const addModalArchiveBodyBuilder = htmlFactory(htmlTemplates.addModalArchiveBody);
@@ -90,12 +96,31 @@ const addShowArchives = (boardId) => {
     domManager.addChild(`.modal-body-Archive-${boardId}`, modalContentBody);
 }
 
-const openArchivedHandler = async (e) => {
-    e.stopPropagation();
-    // const boardId = e.target.dataset.boardId;
+const showArchivesModalHandler = async (e) => {
+    const boardId = e.target.dataset.boardId;
+    const archivedCardLi = document.querySelector(`.archived-cards-${boardId}`);
+    archivedCardLi.innerHTML = "";
+    const archivedCards = await dataHandler.getArchived(boardId);
+    for (let archivedCard of archivedCards) {
+        const addModalArchiveCardBuilder = htmlFactory(htmlTemplates.addModalArchiveCard);
+        const modalCardContent = addModalArchiveCardBuilder(archivedCard);
+        domManager.addChild(`.archived-cards-${boardId}`, modalCardContent);
+        const unArchiveButton = document.querySelector(`.un-archive[data-card-id="${archivedCard.id}"]`);
+        unArchiveButton.classList.add("pointer");
+        domManager.addEventListener(`.un-archive[data-card-id="${archivedCard.id}"]`, "click", unArchiveHandler);
+    }
 }
 
-function sortByStatusId(a, b) {
+const unArchiveHandler = async (e) => {
+    const cardId = e.target.dataset.cardId;
+    const boardId = e.target.dataset.boardId;
+    await dataHandler.updateArchives(cardId, true);
+    const archivedCard = document.querySelector(`.archived-card-li-${cardId}`);
+    archivedCard.parentElement.removeChild(archivedCard);
+    await boardsManager.refreshBoard(boardId, false);
+}
+
+function sortByStatusId (a, b) {
     if (a.id < b.id) {
         return -1;
     }
@@ -105,7 +130,7 @@ function sortByStatusId(a, b) {
     return 0;
 }
 
-function renameTable(clickEvent) {
+function renameTable (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const selectorString = `.board-title[data-board-id="${boardId}"]`
     const rename = document.querySelector(selectorString)
@@ -117,7 +142,7 @@ function renameTable(clickEvent) {
     })
 }
 
-async function addCardInput(clickEvent) {
+async function addCardInput (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const createNewCard = htmlFactory(htmlTemplates.createNewCard);
@@ -130,7 +155,7 @@ async function addCardInput(clickEvent) {
     domManager.addEventListener(`#new-card-input-field${boardId}`, "click", noClickEvent);
 }
 
-async function addCard(clickEvent) {
+async function addCard (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const createCardInputField = document.querySelector(`#new-card-input-field${boardId}`);
@@ -139,30 +164,30 @@ async function addCard(clickEvent) {
     await boardsManager.refreshBoard(boardId);
 }
 
-async function addColumn(clickEvent) {
+async function addColumn (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const newColumnTitle = document.querySelector(`#modalInputId${boardId}`).value;
     await dataHandler.createNewColumn(boardId, newColumnTitle);
     await boardsManager.refreshBoard(boardId);
 }
 
-async function checkInput(e) {
+async function checkInput (e) {
     const boardId = e.target.dataset.boardId;
     const createColumnButton = document.querySelector(`#modalSubmitButton${boardId}`);
     createColumnButton.disabled = !e.target.value;
 }
 
-async function checkCreateCardInput(e) {
+async function checkCreateCardInput (e) {
     const boardId = e.target.dataset.boardId;
     const createCardButton = document.querySelector(`#new-card${boardId}`);
     createCardButton.disabled = !e.target.value;
 }
 
-export async function noClickEvent(e) {
+export async function noClickEvent (e) {
     e.stopPropagation();
 }
 
-function createBoardHandler(clickEvent) {
+function createBoardHandler (clickEvent) {
     const buttonSpan = clickEvent.target.parentElement;
     const createButton = clickEvent.target;
     const inputFieldSelector = `#new-board-input-field`;
@@ -184,44 +209,46 @@ function createBoardHandler(clickEvent) {
     }
 }
 
-function hideForm(createButton, inputField, submitButton) {
+function hideForm (createButton, inputField, submitButton) {
     createButton.parentElement.removeChild(inputField);
     createButton.parentElement.removeChild(submitButton);
     createButton.classList.toggle('hidden');
 }
 
-function addCreateStatus(boardId) {
+function addCreateStatus (boardId, deleteModals) {
     const addStatusButton = htmlFactory(htmlTemplates.addStatusButton);
     const addStatusButtonContent = addStatusButton(boardId)
     domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, addStatusButtonContent);
-    const addModalBuilder = htmlFactory(htmlTemplates.addModal);
-    const addColumnModalBody = htmlFactory(htmlTemplates.addColumnModalBody);
-    const modalTitle = "Add a column";
-    const modalLabelText = "Column name";
-    const placeholderText = "Enter a column name (To Do, in Progress, Done)";
-    const modalContent = addModalBuilder(modalTitle, "Column", boardId);
-    const modalContentBody = addColumnModalBody(boardId, modalLabelText, placeholderText);
-    domManager.addChild(`#modalContainer`, modalContent);
-    domManager.addChild(`.modal-body-Column-${boardId}`, modalContentBody);
-    domManager.addEventListener(`#modalInputId${boardId}`, "input", checkInput);
-    domManager.addEventListener(`#modalSubmitButton${boardId}`, "click", addColumn);
+    if (deleteModals) {
+        const addModalBuilder = htmlFactory(htmlTemplates.addModal);
+        const addColumnModalBody = htmlFactory(htmlTemplates.addColumnModalBody);
+        const modalTitle = "Add a column";
+        const modalLabelText = "Column name";
+        const placeholderText = "Enter a column name (To Do, in Progress, Done)";
+        const modalContent = addModalBuilder(modalTitle, "Column", boardId);
+        const modalContentBody = addColumnModalBody(boardId, modalLabelText, placeholderText);
+        domManager.addChild(`#modalContainer`, modalContent);
+        domManager.addChild(`.modal-body-Column-${boardId}`, modalContentBody);
+        domManager.addEventListener(`#modalInputId${boardId}`, "input", checkInput);
+        domManager.addEventListener(`#modalSubmitButton${boardId}`, "click", addColumn);
+    }
 }
 
-function addCreateCard(boardId) {
+function addCreateCard (boardId) {
     const addCreateCardButton = htmlFactory(htmlTemplates.addCreateCardButton);
     const addCreateCardButtonContent = addCreateCardButton(boardId);
     domManager.addChild(`.add-card-button-container${boardId}`, addCreateCardButtonContent);
     domManager.addEventListener(`.board-add-new-card[data-board-id="${boardId}"]`, "click", addCardInput);
 }
 
-async function deleteBoard(clickEvent) {
+async function deleteBoard (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     await dataHandler.deleteBoard(boardId);
     await reset();
 }
 
-async function deleteColumn(clickEvent) {
+async function deleteColumn (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const statusId = clickEvent.target.dataset.statusId;
     await dataHandler.deleteColumn(boardId, statusId);
@@ -231,7 +258,7 @@ async function deleteColumn(clickEvent) {
     await cardsManager.initDragAndDrop(boardId);
 }
 
-async function renameColumnHandler(clickEvent) {
+async function renameColumnHandler (clickEvent) {
     const statusId = clickEvent.target.dataset.statusId;
     const boardId = clickEvent.target.dataset.boardId;
     const renameColumnCurrentName = document.querySelector(`#columnName${statusId}`);
@@ -244,7 +271,7 @@ async function renameColumnHandler(clickEvent) {
     document.querySelector(`#new-column-title-${statusId}`).focus()
 }
 
-async function keyDownOnRenameColumn(e) {
+async function keyDownOnRenameColumn (e) {
     const statusId = e.target.dataset.statusId;
     const boardId = e.target.dataset.boardId;
     if (e.key === 'Enter') {
@@ -263,7 +290,7 @@ async function keyDownOnRenameColumn(e) {
     }
 }
 
-async function cancelNameChange(e) {
+async function cancelNameChange (e) {
     const statusId = e.target.dataset.statusId;
     const inputField = document.querySelector(`#new-column-title-${statusId}`);
     const currentColumnName = document.querySelector(`#columnName${statusId}`);

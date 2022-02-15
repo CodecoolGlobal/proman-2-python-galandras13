@@ -8,6 +8,7 @@ export const htmlTemplates = {
     createNewCard: 7,
     addColumnModalBody: 8,
     addModalArchiveBody: 9,
+    addModalArchiveCard: 10,
 }
 
 export function htmlFactory (template) {
@@ -29,7 +30,9 @@ export function htmlFactory (template) {
         case htmlTemplates.addColumnModalBody:
             return addModalColumnBodyBuilder;
         case htmlTemplates.addModalArchiveBody:
-            return addModalArchiveBodyBuilder
+            return addModalArchiveBodyBuilder;
+        case htmlTemplates.addModalArchiveCard:
+            return addModalArchiveCardBuilder;
         default:
             console.error("Undefined template: " + template)
             return () => {
@@ -123,24 +126,29 @@ function addStatusBuilder (boardId) {
 }
 
 function addModalBuilder (modalTitle, type, boardId = null) {
-    return `<div class="modal fade" id="Add${type}Modal${boardId}" role="dialog">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">${modalTitle}</h4>
-                        </div>
-                        <div class="modal-body-${type}-${boardId}">
-                            
-                        </div>
-                        <div class="modal-footer">
+    let modalContent = "";
+    modalContent += `<div class="modal fade" id="Add${type}Modal${boardId}" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">${modalTitle}</h4>
+                                </div>
+                                <div class="modal-body-${type}-${boardId}">
+                                    
+                                </div>`;
+    if (type === "Column") {
+        modalContent += `<div class="modal-footer">
                             <span class="board-id-for-modal"></span>
                             <button id="modalSubmitButton${boardId}" class="btn" data-board-id="${boardId}" data-dismiss="modal" disabled>Create</button>
-                        </div>
-                    </div>
+                        </div>`;
+    }
+    modalContent += `</div>
                 </div>
-            </div>`
+            </div>`;
+    return modalContent;
 }
+
 
 const addModalColumnBodyBuilder = (boardId, modalLabelText, placeholderText) => {
     return `<label for="modalInputId${boardId}">${modalLabelText}</label>
@@ -159,4 +167,12 @@ function addCreateCardBuilder (boardId) {
 export function createNewCardInputBuilder (boardId) {
     return `<input type="text" placeholder="Card name" id="new-card-input-field${boardId}" data-board-id="${boardId}" autofocus>
            <button id="new-card${boardId}" class="" data-board-id="${boardId}" disabled>Save</button>`
+}
+
+const addModalArchiveCardBuilder = (archivedCard) => {
+    return `<li class="archived-card-li-${archivedCard.id}"><div class="archived-card"  data-card-id="${archivedCard.id}" data-board-id="${archivedCard.board_id}">
+                    <span class="archived-cardName" data-card-id="${archivedCard.id}" data-board-id="${archivedCard.board_id}">${archivedCard.title}</span>
+                    <i class="un-archive fas fa-archive" data-card-id="${archivedCard.id}" data-board-id="${archivedCard.board_id}"></i>
+                </div>
+            </div></li>`
 }

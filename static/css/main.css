@@ -104,6 +104,14 @@ section.board {
     padding: 4px;
 }
 
+.archived-card {
+    background: #222;
+    color: #fff;
+    border-radius: var(--border-radius);
+    margin: 4px 0;
+    padding: 4px;
+}
+
 .board-column:nth-of-type(1) .card {
     background: var(--status-1);
 }
@@ -244,7 +252,7 @@ section.board {
     margin: 20px 10px;
 }
 
-.modal-body{
+.modal-body {
     display: flex;
     flex-direction: column;
     min-height: 10rem;
@@ -271,11 +279,11 @@ section.board {
     cursor: pointer;
 }
 
-.add-card-button-container{
+.add-card-button-container {
     margin-left: 5rem;
 }
 
-.board-header{
+.board-header {
     /*display:flex;*/
     align-items: center;
     /*width: 100%;*/
@@ -296,4 +304,9 @@ section.board {
 
 input {
     color: black;
+}
+
+li {
+    width: fit-content;
+    max-width: 90%;
 }
