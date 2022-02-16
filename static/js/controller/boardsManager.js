@@ -60,7 +60,7 @@ export let boardsManager = {
         await boardsManager.showColumn(boardId, deleteModals);
         await cardsManager.loadCards(boardId);
         await cardsManager.initDragAndDrop(boardId);
-    }
+    },
 };
 
 async function showHideButtonHandler (clickEvent) {
@@ -154,12 +154,69 @@ async function addCardHandler (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const createCardInputField = document.querySelector(`#new-card-input-field${boardId}`);
-    const newCardName = createCardInputField.value;
-    const sessionStorageCreateCardContent = {'cardName': newCardName, 'boardId': boardId};
-    sessionStorage.setItem('newCard', JSON.stringify(sessionStorageCreateCardContent));
+    let newCardName = createCardInputField.value;
+    await addCardHistoryHandler(createCardInputField, boardId, newCardName);
+    //TODO: Update list------------------------------------------
     await dataHandler.createNewCard(boardId, newCardName);
     await boardsManager.refreshBoard(boardId);
 }
+
+const addCardHistoryHandler = async (createCardInputField, boardId, newCardName) => {
+    const board = await dataHandler.getBoard(boardId);
+    const sessionStorageCreateCardContent = { 'cardName': newCardName, 'boardName': board.title };
+
+    if (sessionStorage.getItem("historyIndex")) {
+        let historyLength = +sessionStorage.getItem("historyIndex") + 1;
+        sessionStorage.setItem("historyIndex", `${historyLength}`);
+    } else {
+        sessionStorage.setItem("historyIndex", "0")
+    }
+
+    sessionStorage.setItem(`${sessionStorage.getItem("historyIndex")}-newCard`, JSON.stringify(sessionStorageCreateCardContent));
+    let historyLength = sessionStorage.getItem("historyIndex");
+    sessionStorage.setItem("historyIndex", `${historyLength}`);
+}
+
+// const addCardHistoryHandler = async (createCardInputField, boardId) => {
+//     let newCardName;
+//     const board = await dataHandler.getBoard(boardId);
+//
+//     if (historyNewCardAlreadyExist) {
+//         newCardName = createCardInputField.value;
+//         const sessionStorageCreateCardContent = { 'cardName': newCardName, 'boardName': board.title };
+//         sessionStorage.setItem(`${sessionStorage.getItem("historyLength")}-newCard-${newCardCounter}`, JSON.stringify(sessionStorageCreateCardContent));
+//         newCardCounter++;
+//         let historyLength = +sessionStorage.getItem("historyLength") + 1;
+//         console.log(historyLength);
+//         sessionStorage.setItem("historyLength", `${historyLength}`);
+//     } else {
+//         if (sessionStorage.getItem("historyLength")) {
+//             let historyLength = +sessionStorage.getItem("historyLength") + 1;
+//             console.log(historyLength);
+//             sessionStorage.setItem("historyLength", `${historyLength}`);
+//         } else {
+//             sessionStorage.setItem("historyLength", "1");
+//         }
+//         newCardName = createCardInputField.value;
+//         const sessionStorageCreateCardContent = { 'cardName': newCardName, 'boardName': board.title };
+//         sessionStorage.setItem(`${sessionStorage.getItem("historyLength")}-newCard-1`, JSON.stringify(sessionStorageCreateCardContent));
+//         newCardCounter = 2;
+//         let historyLength = +sessionStorage.getItem("historyLength") + 1;
+//         console.log(historyLength);
+//         sessionStorage.setItem("historyLength", `${historyLength}`);
+//     }
+//     return newCardName;
+// }
+
+// const historyNewCardAlreadyExist = () => {
+//     let sessionStorageKeys = Object.keys(sessionStorage);
+//     for (let sessionStorageKey of sessionStorageKeys) {
+//         if (sessionStorageKey.includes("newCard")) {
+//             return  true;
+//         }
+//     }
+//     return false
+// }
 
 async function addColumn (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;

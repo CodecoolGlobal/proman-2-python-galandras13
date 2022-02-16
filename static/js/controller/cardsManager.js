@@ -36,13 +36,15 @@ export let cardsManager = {
 };
 
 async function renameCard (clickEvent) {
+    console.log(clickEvent);
     const cardId = clickEvent.target.dataset.cardId;
     const boardId = clickEvent.target.dataset.boardId;
+    const statusId = clickEvent.target.dataset.statusId;
     const renameCardCurrentName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
     renameCardCurrentName.classList.add("hidden");
     const currentCardTitle = clickEvent.target.innerText;
     const newCardTitle = htmlFactory(htmlTemplates.newCardTitle);
-    const renameCardContent = newCardTitle(boardId, cardId, currentCardTitle);
+    const renameCardContent = newCardTitle(boardId, cardId, currentCardTitle, statusId);
     domManager.addChildAfterBegin(`.card[data-card-id="${cardId}"]`, renameCardContent);
     domManager.addEventListener(`#new-card-title-${boardId}`, "keydown", keyDownOnRenameCard);
     domManager.addEventListener(`#new-card-title-${boardId}`, "click", noClickEvent);
@@ -53,12 +55,13 @@ async function renameCard (clickEvent) {
 async function keyDownOnRenameCard (e) {
     const cardId = e.target.dataset.cardId;
     const boardId = e.target.dataset.boardId;
+    const statusId = e.target.dataset.statusId;
     if (e.key === 'Enter') {
         if (e.target.value) {
             const previousTitle = e.target.placeholder;
             const modifiedTitle = document.querySelector(`#new-card-title-${boardId}`).value;
-            const sessionStorageModifyCardContent = {'cardName': modifiedTitle, 'previousTitle': previousTitle, 'boardId': boardId};
-            sessionStorage.setItem('updateCard', JSON.stringify(sessionStorageModifyCardContent));
+            await renameHistoryHandler(statusId, modifiedTitle, previousTitle);
+            //TODO update history list---------
             await dataHandler.renameCard(cardId, modifiedTitle);
             await boardsManager.refreshBoard(boardId);
         }
@@ -68,6 +71,30 @@ async function keyDownOnRenameCard (e) {
         inputField.parentElement.removeChild(inputField);
         currentCardName.classList.remove("hidden");
     }
+}
+
+const renameHistoryHandler = async (statusId, modifiedTitle, previousTitle) => {
+    const status = await dataHandler.getStatus(statusId);
+    const sessionStorageModifyCardContent = {
+        'cardName': modifiedTitle,
+        'previousTitle': previousTitle,
+        'statusName': status.title
+    };
+
+    if (sessionStorage.getItem("historyIndex")) {
+        let historyLength = +sessionStorage.getItem("historyIndex") + 1;
+        sessionStorage.setItem("historyIndex", `${historyLength}`);
+    } else {
+        sessionStorage.setItem("historyIndex", "0")
+    }
+
+    sessionStorage.setItem(`${sessionStorage.getItem("historyIndex")}-updateCard`, JSON.stringify(sessionStorageModifyCardContent));
+    let historyLength = sessionStorage.getItem("historyIndex");
+    sessionStorage.setItem("historyIndex", `${historyLength}`);
+
+    // const showHistoryUpdateBuilder = htmlFactory(htmlTemplates.showHistoryUpdate);
+    // const historyContent = showHistoryUpdateBuilder(status.title, modifiedTitle, previousTitle);
+    // domManager.addChildAfterBegin(`.session-history-list`, historyContent);
 }
 
 async function cancelNameChange (e) {
@@ -93,13 +120,34 @@ async function deleteCardHandler (clickEvent) {
     const boardId = clickEvent.currentTarget.dataset.boardId;
     const cardId = clickEvent.currentTarget.dataset.cardId;
     const cardName = clickEvent.currentTarget.dataset.cardTitle;
-    const sessionStorageModifyCardContent = {'cardName': cardName, 'boardId': boardId};
-    sessionStorage.setItem('deleteCard', JSON.stringify(sessionStorageModifyCardContent));
+    await deleteCardHistoryHandler(cardName, boardId, );
+    //TODO update history list---------
     await dataHandler.deleteCard(cardId);
     await boardsManager.hideCards(boardId);
     await boardsManager.showColumn(boardId);
     await cardsManager.loadCards(boardId);
     await cardsManager.initDragAndDrop(boardId);
+}
+
+const deleteCardHistoryHandler = async (cardName, boardId, ) => {
+
+    const board = await dataHandler.getBoard(boardId);
+    const sessionStorageModifyCardContent = { 'cardName': cardName, 'boardName': board.title };
+
+    if (sessionStorage.getItem("historyIndex")) {
+        let historyLength = +sessionStorage.getItem("historyIndex") + 1;
+        sessionStorage.setItem("historyIndex", `${historyLength}`);
+    } else {
+        sessionStorage.setItem("historyIndex", "0")
+    }
+
+    sessionStorage.setItem(`${sessionStorage.getItem("historyIndex")}-deleteCard`, JSON.stringify(sessionStorageModifyCardContent));
+    let historyLength = sessionStorage.getItem("historyIndex");
+    sessionStorage.setItem("historyIndex", `${historyLength}`);
+
+    // const showHistoryBuilder = htmlFactory(htmlTemplates.showHistory);
+    // const historyContent = showHistoryBuilder("deleted", board.title, cardName);
+    // domManager.addChildAfterBegin(`.session-history-list`, historyContent);
 }
 
 let addToArchiveHandler = async (event) => {
