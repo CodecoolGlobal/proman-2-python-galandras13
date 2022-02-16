@@ -52,7 +52,7 @@ function boardBuilder (board) {
                             <i class="fas fa-chevron-down" data-board-id="${board.id}"></i>
                         </button>
                         <button type="button" class="show-archive" data-board-id="${board.id}" data-toggle="modal" data-target="#AddArchiveModal${board.id}" hidden>Show archived cards
-                            <i class="fas fa-archive"></i>
+                            <i class="fas fa-archive" data-board-id="${board.id}"></i>
                         </button>
                     </span>
                 </div>
