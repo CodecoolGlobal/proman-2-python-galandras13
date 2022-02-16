@@ -91,9 +91,9 @@ function newColumnTitle (boardId = "", statusId = "") {
                     autofocus>`;
 }
 
-function newCardTitle (boardId = "", cardId = "") {
+function newCardTitle (boardId = "", cardId = "", currentCardTitle="") {
     return `<input type="text" 
-                    placeholder="Enter new card title" 
+                    placeholder="${currentCardTitle}" 
                     id="new-card-title-${boardId}"
                     data-board-id="${boardId}"
                     data-card-id="${cardId}"
@@ -113,7 +113,7 @@ function cardBuilder (card) {
                 <div class="archive-add" data-card-id="${card.id}" data-board-id="${card.board_id}">
                     <i class="fas fa-archive"></i>
                 </div>
-                <div class="card-remove" data-card-id="${card.id}" data-board-id="${card.board_id}">
+                <div class="card-remove" data-card-id="${card.id}" data-board-id="${card.board_id}" data-card-title="${card.title}">
                     <i class="fas fa-trash-alt"></i>
                 </div>
             </div>`;

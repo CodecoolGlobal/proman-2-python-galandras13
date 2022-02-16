@@ -21,7 +21,7 @@ export let cardsManager = {
                 const cardBuilder = htmlFactory(htmlTemplates.card);
                 const content = cardBuilder(card);
                 domManager.addChild(`.board-column-content[data-status-id="${card.status_id}"][data-board-id="${boardId}"]`, content);
-                domManager.addEventListener(`.card-remove[data-card-id="${card.id}"]`, "click", deleteButtonHandler);
+                domManager.addEventListener(`.card-remove[data-card-id="${card.id}"]`, "click", deleteCardHandler);
                 domManager.addEventListener(`.cardName[data-card-id="${card.id}"][data-board-id="${card.board_id}"]`, "click", renameCard);
                 domManager.addEventListener(`.archive-add[data-card-id="${card.id}"]`, "click", addToArchiveHandler);
             } else {
@@ -40,8 +40,9 @@ async function renameCard (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const renameCardCurrentName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
     renameCardCurrentName.classList.add("hidden");
+    const currentCardTitle = clickEvent.target.innerText;
     const newCardTitle = htmlFactory(htmlTemplates.newCardTitle);
-    const renameCardContent = newCardTitle(boardId, cardId);
+    const renameCardContent = newCardTitle(boardId, cardId, currentCardTitle);
     domManager.addChildAfterBegin(`.card[data-card-id="${cardId}"]`, renameCardContent);
     domManager.addEventListener(`#new-card-title-${boardId}`, "keydown", keyDownOnRenameCard);
     domManager.addEventListener(`#new-card-title-${boardId}`, "click", noClickEvent);
@@ -54,7 +55,10 @@ async function keyDownOnRenameCard (e) {
     const boardId = e.target.dataset.boardId;
     if (e.key === 'Enter') {
         if (e.target.value) {
+            const previousTitle = e.target.placeholder;
             const modifiedTitle = document.querySelector(`#new-card-title-${boardId}`).value;
+            const sessionStorageModifyCardContent = {'cardName': modifiedTitle, 'previousTitle': previousTitle, 'boardId': boardId};
+            sessionStorage.setItem('updateCard', JSON.stringify(sessionStorageModifyCardContent));
             await dataHandler.renameCard(cardId, modifiedTitle);
             await boardsManager.refreshBoard(boardId);
         }
@@ -85,9 +89,12 @@ function sortByCardOrder (a, b) {
     return 0;
 }
 
-async function deleteButtonHandler (clickEvent) {
+async function deleteCardHandler (clickEvent) {
     const boardId = clickEvent.currentTarget.dataset.boardId;
     const cardId = clickEvent.currentTarget.dataset.cardId;
+    const cardName = clickEvent.currentTarget.dataset.cardTitle;
+    const sessionStorageModifyCardContent = {'cardName': cardName, 'boardId': boardId};
+    sessionStorage.setItem('deleteCard', JSON.stringify(sessionStorageModifyCardContent));
     await dataHandler.deleteCard(cardId);
     await boardsManager.hideCards(boardId);
     await boardsManager.showColumn(boardId);

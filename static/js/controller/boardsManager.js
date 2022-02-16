@@ -145,16 +145,18 @@ async function addCardInput (clickEvent) {
     const createCardButton = document.querySelector(`.board-add-new-card[data-board-id="${boardId}"]`);
     createCardButton.classList.add("hidden");
     domManager.addChild(`.add-card-button-container${boardId}`, createNewCardInputContent);
-    domManager.addEventListener(`#new-card${boardId}`, "click", addCard);
+    domManager.addEventListener(`#new-card${boardId}`, "click", addCardHandler);
     domManager.addEventListener(`#new-card-input-field${boardId}`, "input", checkCreateCardInput);
     domManager.addEventListener(`#new-card-input-field${boardId}`, "click", noClickEvent);
 }
 
-async function addCard (clickEvent) {
+async function addCardHandler (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const createCardInputField = document.querySelector(`#new-card-input-field${boardId}`);
     const newCardName = createCardInputField.value;
+    const sessionStorageCreateCardContent = {'cardName': newCardName, 'boardId': boardId};
+    sessionStorage.setItem('newCard', JSON.stringify(sessionStorageCreateCardContent));
     await dataHandler.createNewCard(boardId, newCardName);
     await boardsManager.refreshBoard(boardId);
 }
