@@ -2,6 +2,7 @@ import { dataHandler } from "../data/dataHandler.js";
 import { htmlFactory, htmlTemplates } from "../view/htmlFactory.js";
 import { domManager } from "../view/domManager.js";
 import { boardsManager, noClickEvent } from "./boardsManager.js";
+import { historyManager } from "./historyManager.js";
 
 const ui = {
     slots: null,
@@ -40,6 +41,7 @@ async function renameCard (clickEvent) {
     const cardId = clickEvent.target.dataset.cardId;
     const boardId = clickEvent.target.dataset.boardId;
     const statusId = clickEvent.target.dataset.statusId;
+    console.log(clickEvent.target);
     const renameCardCurrentName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
     renameCardCurrentName.classList.add("hidden");
     const currentCardTitle = clickEvent.target.innerText;
@@ -56,12 +58,14 @@ async function keyDownOnRenameCard (e) {
     const cardId = e.target.dataset.cardId;
     const boardId = e.target.dataset.boardId;
     const statusId = e.target.dataset.statusId;
+    console.log(e.target);
     if (e.key === 'Enter') {
         if (e.target.value) {
             const previousTitle = e.target.placeholder;
             const modifiedTitle = document.querySelector(`#new-card-title-${boardId}`).value;
+            console.log(statusId);
             await renameHistoryHandler(statusId, modifiedTitle, previousTitle);
-            //TODO update history list---------
+            await historyManager.showHistory()
             await dataHandler.renameCard(cardId, modifiedTitle);
             await boardsManager.refreshBoard(boardId);
         }
@@ -91,10 +95,6 @@ const renameHistoryHandler = async (statusId, modifiedTitle, previousTitle) => {
     sessionStorage.setItem(`${sessionStorage.getItem("historyIndex")}-updateCard`, JSON.stringify(sessionStorageModifyCardContent));
     let historyLength = sessionStorage.getItem("historyIndex");
     sessionStorage.setItem("historyIndex", `${historyLength}`);
-
-    // const showHistoryUpdateBuilder = htmlFactory(htmlTemplates.showHistoryUpdate);
-    // const historyContent = showHistoryUpdateBuilder(status.title, modifiedTitle, previousTitle);
-    // domManager.addChildAfterBegin(`.session-history-list`, historyContent);
 }
 
 async function cancelNameChange (e) {
@@ -121,7 +121,7 @@ async function deleteCardHandler (clickEvent) {
     const cardId = clickEvent.currentTarget.dataset.cardId;
     const cardName = clickEvent.currentTarget.dataset.cardTitle;
     await deleteCardHistoryHandler(cardName, boardId, );
-    //TODO update history list---------
+    await historyManager.showHistory()
     await dataHandler.deleteCard(cardId);
     await boardsManager.hideCards(boardId);
     await boardsManager.showColumn(boardId);
@@ -144,10 +144,6 @@ const deleteCardHistoryHandler = async (cardName, boardId, ) => {
     sessionStorage.setItem(`${sessionStorage.getItem("historyIndex")}-deleteCard`, JSON.stringify(sessionStorageModifyCardContent));
     let historyLength = sessionStorage.getItem("historyIndex");
     sessionStorage.setItem("historyIndex", `${historyLength}`);
-
-    // const showHistoryBuilder = htmlFactory(htmlTemplates.showHistory);
-    // const historyContent = showHistoryBuilder("deleted", board.title, cardName);
-    // domManager.addChildAfterBegin(`.session-history-list`, historyContent);
 }
 
 let addToArchiveHandler = async (event) => {
@@ -211,6 +207,11 @@ async function handleDragEnd () {
                 'card_order': cardOrder,
                 'status_id': statusId
             };
+            console.log(card);
+            console.log("fuck");
+            // card.dataset.statusId = statusId;
+
+            card.children[0].children[0].setAttribute(`data-status-id`, `${statusId}`);
             await dataHandler.updateCards(payload);
         }
     }

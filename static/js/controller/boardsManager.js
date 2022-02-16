@@ -3,6 +3,7 @@ import { htmlFactory, htmlTemplates } from "../view/htmlFactory.js";
 import { domManager } from "../view/domManager.js";
 import { cardsManager } from "./cardsManager.js";
 import { reset } from "../main.js";
+import { historyManager } from "./historyManager.js";
 
 export let boardsManager = {
     loadBoards: async function () {
@@ -156,7 +157,7 @@ async function addCardHandler (clickEvent) {
     const createCardInputField = document.querySelector(`#new-card-input-field${boardId}`);
     let newCardName = createCardInputField.value;
     await addCardHistoryHandler(createCardInputField, boardId, newCardName);
-    //TODO: Update list------------------------------------------
+    await historyManager.showHistory()
     await dataHandler.createNewCard(boardId, newCardName);
     await boardsManager.refreshBoard(boardId);
 }
@@ -176,47 +177,6 @@ const addCardHistoryHandler = async (createCardInputField, boardId, newCardName)
     let historyLength = sessionStorage.getItem("historyIndex");
     sessionStorage.setItem("historyIndex", `${historyLength}`);
 }
-
-// const addCardHistoryHandler = async (createCardInputField, boardId) => {
-//     let newCardName;
-//     const board = await dataHandler.getBoard(boardId);
-//
-//     if (historyNewCardAlreadyExist) {
-//         newCardName = createCardInputField.value;
-//         const sessionStorageCreateCardContent = { 'cardName': newCardName, 'boardName': board.title };
-//         sessionStorage.setItem(`${sessionStorage.getItem("historyLength")}-newCard-${newCardCounter}`, JSON.stringify(sessionStorageCreateCardContent));
-//         newCardCounter++;
-//         let historyLength = +sessionStorage.getItem("historyLength") + 1;
-//         console.log(historyLength);
-//         sessionStorage.setItem("historyLength", `${historyLength}`);
-//     } else {
-//         if (sessionStorage.getItem("historyLength")) {
-//             let historyLength = +sessionStorage.getItem("historyLength") + 1;
-//             console.log(historyLength);
-//             sessionStorage.setItem("historyLength", `${historyLength}`);
-//         } else {
-//             sessionStorage.setItem("historyLength", "1");
-//         }
-//         newCardName = createCardInputField.value;
-//         const sessionStorageCreateCardContent = { 'cardName': newCardName, 'boardName': board.title };
-//         sessionStorage.setItem(`${sessionStorage.getItem("historyLength")}-newCard-1`, JSON.stringify(sessionStorageCreateCardContent));
-//         newCardCounter = 2;
-//         let historyLength = +sessionStorage.getItem("historyLength") + 1;
-//         console.log(historyLength);
-//         sessionStorage.setItem("historyLength", `${historyLength}`);
-//     }
-//     return newCardName;
-// }
-
-// const historyNewCardAlreadyExist = () => {
-//     let sessionStorageKeys = Object.keys(sessionStorage);
-//     for (let sessionStorageKey of sessionStorageKeys) {
-//         if (sessionStorageKey.includes("newCard")) {
-//             return  true;
-//         }
-//     }
-//     return false
-// }
 
 async function addColumn (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
