@@ -185,14 +185,17 @@ section.board {
 
 #registration {
     margin-left: 30px;
+    margin-bottom: 10px;
 }
 
 #login {
     margin-left: 50px;
+    margin-bottom: 10px;
 }
 
 #logout {
     margin-left: 40%;
+    margin-bottom: 8px;
 }
 
 #welcome {
@@ -208,6 +211,13 @@ section.board {
     margin-top: 5px;
     width: 50px;
     height: 50px;
+}
+
+.refresh {
+    background: #ddd url(http://cdn.backgroundhost.com/backgrounds/subtlepatterns/diagonal-noise.png);
+    color: black;
+    margin-bottom: 15px;
+    margin-left: 5px;
 }
 
 /*NAVBAR*/
