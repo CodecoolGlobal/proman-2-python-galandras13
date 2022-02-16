@@ -12,6 +12,8 @@ export let historyManager = {
             },
             {}
         );
+        console.log(sessionStorageKeys);
+        console.log(sessionStorage);
         await clearHistoryList();
         await fillHistoryList(sessionStorageKeys);
     },

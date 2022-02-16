@@ -85,16 +85,16 @@ const renameHistoryHandler = async (statusId, modifiedTitle, previousTitle) => {
         'statusName': status.title
     };
 
-    if (sessionStorage.getItem("historyIndex")) {
-        let historyLength = +sessionStorage.getItem("historyIndex") + 1;
-        sessionStorage.setItem("historyIndex", `${historyLength}`);
+    if (sessionStorage.getItem("0-historyIndex")) {
+        let historyLength = +sessionStorage.getItem("0-historyIndex") + 1;
+        sessionStorage.setItem("0-historyIndex", `${historyLength}`);
     } else {
-        sessionStorage.setItem("historyIndex", "0")
+        sessionStorage.setItem("0-historyIndex", "1")
     }
 
-    sessionStorage.setItem(`${sessionStorage.getItem("historyIndex")}-updateCard`, JSON.stringify(sessionStorageModifyCardContent));
-    let historyLength = sessionStorage.getItem("historyIndex");
-    sessionStorage.setItem("historyIndex", `${historyLength}`);
+    sessionStorage.setItem(`${sessionStorage.getItem("0-historyIndex")}-updateCard`, JSON.stringify(sessionStorageModifyCardContent));
+    let historyLength = sessionStorage.getItem("0-historyIndex");
+    sessionStorage.setItem("0-historyIndex", `${historyLength}`);
 }
 
 async function cancelNameChange (e) {
@@ -134,16 +134,16 @@ const deleteCardHistoryHandler = async (cardName, boardId, ) => {
     const board = await dataHandler.getBoard(boardId);
     const sessionStorageModifyCardContent = { 'cardName': cardName, 'boardName': board.title };
 
-    if (sessionStorage.getItem("historyIndex")) {
-        let historyLength = +sessionStorage.getItem("historyIndex") + 1;
-        sessionStorage.setItem("historyIndex", `${historyLength}`);
+    if (sessionStorage.getItem("0-historyIndex")) {
+        let historyLength = +sessionStorage.getItem("0-historyIndex") + 1;
+        sessionStorage.setItem("0-historyIndex", `${historyLength}`);
     } else {
-        sessionStorage.setItem("historyIndex", "0")
+        sessionStorage.setItem("0-historyIndex", "1")
     }
 
-    sessionStorage.setItem(`${sessionStorage.getItem("historyIndex")}-deleteCard`, JSON.stringify(sessionStorageModifyCardContent));
-    let historyLength = sessionStorage.getItem("historyIndex");
-    sessionStorage.setItem("historyIndex", `${historyLength}`);
+    sessionStorage.setItem(`${sessionStorage.getItem("0-historyIndex")}-deleteCard`, JSON.stringify(sessionStorageModifyCardContent));
+    let historyLength = sessionStorage.getItem("0-historyIndex");
+    sessionStorage.setItem("0-historyIndex", `${historyLength}`);
 }
 
 let addToArchiveHandler = async (event) => {

@@ -166,16 +166,16 @@ const addCardHistoryHandler = async (createCardInputField, boardId, newCardName)
     const board = await dataHandler.getBoard(boardId);
     const sessionStorageCreateCardContent = { 'cardName': newCardName, 'boardName': board.title };
 
-    if (sessionStorage.getItem("historyIndex")) {
-        let historyLength = +sessionStorage.getItem("historyIndex") + 1;
-        sessionStorage.setItem("historyIndex", `${historyLength}`);
+    if (sessionStorage.getItem("0-historyIndex")) {
+        let historyLength = +sessionStorage.getItem("0-historyIndex") + 1;
+        sessionStorage.setItem("0-historyIndex", `${historyLength}`);
     } else {
-        sessionStorage.setItem("historyIndex", "0")
+        sessionStorage.setItem("0-historyIndex", "1")
     }
 
-    sessionStorage.setItem(`${sessionStorage.getItem("historyIndex")}-newCard`, JSON.stringify(sessionStorageCreateCardContent));
-    let historyLength = sessionStorage.getItem("historyIndex");
-    sessionStorage.setItem("historyIndex", `${historyLength}`);
+    sessionStorage.setItem(`${sessionStorage.getItem("0-historyIndex")}-newCard`, JSON.stringify(sessionStorageCreateCardContent));
+    let historyLength = sessionStorage.getItem("0-historyIndex");
+    sessionStorage.setItem("0-historyIndex", `${historyLength}`);
 }
 
 async function addColumn (clickEvent) {
