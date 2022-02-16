@@ -1,5 +1,5 @@
 import { dataHandler } from "../data/dataHandler.js";
-import { htmlFactory, htmlTemplates, newCardTitle } from "../view/htmlFactory.js";
+import { htmlFactory, htmlTemplates } from "../view/htmlFactory.js";
 import { domManager } from "../view/domManager.js";
 import { boardsManager, noClickEvent } from "./boardsManager.js";
 
@@ -40,6 +40,7 @@ async function renameCard (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const renameCardCurrentName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
     renameCardCurrentName.classList.add("hidden");
+    const newCardTitle = htmlFactory(htmlTemplates.newCardTitle);
     const renameCardContent = newCardTitle(boardId, cardId);
     domManager.addChildAfterBegin(`.card[data-card-id="${cardId}"]`, renameCardContent);
     domManager.addEventListener(`#new-card-title-${boardId}`, "keydown", keyDownOnRenameCard);

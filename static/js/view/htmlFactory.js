@@ -9,6 +9,10 @@ export const htmlTemplates = {
     addColumnModalBody: 8,
     addModalArchiveBody: 9,
     addModalArchiveCard: 10,
+    newColumnTitle: 11,
+    newCardTitle: 12,
+    createNewBoardTitle: 13,
+    createNewBoard: 14,
 }
 
 export function htmlFactory (template) {
@@ -33,6 +37,14 @@ export function htmlFactory (template) {
             return addModalArchiveBodyBuilder;
         case htmlTemplates.addModalArchiveCard:
             return addModalArchiveCardBuilder;
+        case htmlTemplates.newColumnTitle:
+            return newColumnTitle;
+        case htmlTemplates.newCardTitle:
+            return newCardTitle;
+        case htmlTemplates.createNewBoardTitle:
+            return createNewBoardTitle;
+        case htmlTemplates.createNewBoard:
+            return createNewBoard;
         default:
             console.error("Undefined template: " + template)
             return () => {
@@ -61,7 +73,7 @@ function boardBuilder (board) {
             </section>`;
 }
 
-export function createNewBoardTitle (boardId = '') {
+function createNewBoardTitle (boardId = '') {
     boardId = boardId ? `-${boardId}` : "";
     return `<input type="text" 
                     placeholder="Board Title" 
@@ -70,7 +82,7 @@ export function createNewBoardTitle (boardId = '') {
            <button id="submit-new-board-title${boardId}">Submit</button>`;
 }
 
-export function newColumnTitle (boardId = "", statusId = "") {
+function newColumnTitle (boardId = "", statusId = "") {
     return `<input type="text" 
                     placeholder="Enter new column title" 
                     id="new-column-title-${statusId}"
@@ -79,7 +91,7 @@ export function newColumnTitle (boardId = "", statusId = "") {
                     autofocus>`;
 }
 
-export function newCardTitle (boardId = "", cardId = "") {
+function newCardTitle (boardId = "", cardId = "") {
     return `<input type="text" 
                     placeholder="Enter new card title" 
                     id="new-card-title-${boardId}"
@@ -88,7 +100,7 @@ export function newCardTitle (boardId = "", cardId = "") {
                     autofocus>`;
 }
 
-export function createNewBoard () {
+function createNewBoard () {
     return `<input type="text" placeholder="Board Title" id="new-board-input-field" autofocus>
            <button id="new-board">Save</button>`;
 }
@@ -164,7 +176,7 @@ function addCreateCardBuilder (boardId) {
     return `<button class="board-add-new-card" data-board-id="${boardId}">Create new card</button>`;
 }
 
-export function createNewCardInputBuilder (boardId) {
+function createNewCardInputBuilder (boardId) {
     return `<input type="text" placeholder="Card name" id="new-card-input-field${boardId}" data-board-id="${boardId}" autofocus>
            <button id="new-card${boardId}" class="" data-board-id="${boardId}" disabled>Save</button>`;
 }

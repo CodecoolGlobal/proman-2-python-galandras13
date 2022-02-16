@@ -1,11 +1,5 @@
 import { dataHandler } from "../data/dataHandler.js";
-import {
-    createNewBoardTitle,
-    createNewBoard,
-    htmlFactory,
-    htmlTemplates,
-    newColumnTitle
-} from "../view/htmlFactory.js";
+import { htmlFactory, htmlTemplates } from "../view/htmlFactory.js";
 import { domManager } from "../view/domManager.js";
 import { cardsManager } from "./cardsManager.js";
 import { reset } from "../main.js";
@@ -134,6 +128,7 @@ function renameTable (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const selectorString = `.board-title[data-board-id="${boardId}"]`;
     const rename = document.querySelector(selectorString);
+    const createNewBoardTitle = htmlFactory(htmlTemplates.createNewBoardTitle);
     rename.innerHTML = createNewBoardTitle(boardId);
     domManager.addEventListener(`#submit-new-board-title-${boardId}`, 'click', async () => {
         const updatedBoardTitle = document.querySelector(`#new-board-title-${boardId}`).value;
@@ -194,6 +189,7 @@ function createBoardHandler (clickEvent) {
 
     if (!document.querySelector(inputFieldSelector)) {
         createButton.classList.toggle('hidden');
+        const createNewBoard = htmlFactory(htmlTemplates.createNewBoard);
         const textBox = createNewBoard();
         buttonSpan.insertAdjacentHTML('afterbegin', textBox);
         const inputField = document.querySelector(inputFieldSelector);
@@ -263,6 +259,7 @@ async function renameColumnHandler (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const renameColumnCurrentName = document.querySelector(`#columnName${statusId}`);
     renameColumnCurrentName.classList.add("hidden");
+    const newColumnTitle = htmlFactory(htmlTemplates.newColumnTitle);
     const renameColumnContent = newColumnTitle(boardId, statusId);
     domManager.addChildAfterBegin(`.board-column-title-${statusId}`, renameColumnContent);
     domManager.addEventListener(`#new-column-title-${statusId}`, "keydown", keyDownOnRenameColumn);
