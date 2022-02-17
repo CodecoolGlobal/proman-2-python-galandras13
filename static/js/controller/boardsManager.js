@@ -1,4 +1,4 @@
-import {dataHandler} from "../data/dataHandler.js";
+import { dataHandler } from "../data/dataHandler.js";
 import {
     createNewBoardTitle,
     createNewBoard,
@@ -6,9 +6,9 @@ import {
     htmlTemplates,
     newColumnTitle
 } from "../view/htmlFactory.js";
-import {domManager} from "../view/domManager.js";
-import {cardsManager} from "./cardsManager.js";
-import {reset} from "../main.js";
+import { domManager } from "../view/domManager.js";
+import { cardsManager } from "./cardsManager.js";
+import { reset } from "../main.js";
 import { websocketManager } from "./websocketManager.js";
 
 export let boardsManager = {
@@ -60,7 +60,7 @@ export let boardsManager = {
     }
 };
 
-async function showHideButtonHandler(clickEvent) {
+async function showHideButtonHandler (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
     const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
@@ -75,7 +75,7 @@ async function showHideButtonHandler(clickEvent) {
     }
 }
 
-function sortByStatusId(a, b) {
+function sortByStatusId (a, b) {
     if (a.id < b.id) {
         return -1;
     }
@@ -85,7 +85,7 @@ function sortByStatusId(a, b) {
     return 0;
 }
 
-function renameTable(clickEvent) {
+function renameTable (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const selectorString = `.board-title[data-board-id="${boardId}"]`
     const rename = document.querySelector(selectorString)
@@ -97,7 +97,7 @@ function renameTable(clickEvent) {
     })
 }
 
-async function addCardInput(clickEvent) {
+async function addCardInput (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const createNewCard = htmlFactory(htmlTemplates.createNewCard);
@@ -110,7 +110,7 @@ async function addCardInput(clickEvent) {
     domManager.addEventListener(`#new-card-input-field${boardId}`, "click", noClickEvent);
 }
 
-async function addCard(clickEvent) {
+async function addCard (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const createCardInputField = document.querySelector(`#new-card-input-field${boardId}`);
@@ -120,30 +120,30 @@ async function addCard(clickEvent) {
     await boardsManager.refreshBoard(boardId);
 }
 
-async function addColumn(clickEvent) {
+async function addColumn (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const newColumnTitle = document.querySelector(`#modalInputId${boardId}`).value;
     await dataHandler.createNewColumn(boardId, newColumnTitle);
     await boardsManager.refreshBoard(boardId);
 }
 
-async function checkInput(e) {
+async function checkInput (e) {
     const boardId = e.target.dataset.boardId;
     const createColumnButton = document.querySelector(`#modalSubmitButton${boardId}`);
     createColumnButton.disabled = !e.target.value;
 }
 
-async function checkCreateCardInput(e) {
+async function checkCreateCardInput (e) {
     const boardId = e.target.dataset.boardId;
     const createCardButton = document.querySelector(`#new-card${boardId}`);
     createCardButton.disabled = !e.target.value;
 }
 
-export async function noClickEvent(e) {
+export async function noClickEvent (e) {
     e.stopPropagation();
 }
 
-function createBoardHandler(clickEvent) {
+function createBoardHandler (clickEvent) {
     const buttonSpan = clickEvent.target.parentElement;
     const createButton = clickEvent.target;
     const inputFieldSelector = `#new-board-input-field`;
@@ -165,13 +165,13 @@ function createBoardHandler(clickEvent) {
     }
 }
 
-function hideForm(createButton, inputField, submitButton) {
+function hideForm (createButton, inputField, submitButton) {
     createButton.parentElement.removeChild(inputField);
     createButton.parentElement.removeChild(submitButton);
     createButton.classList.toggle('hidden');
 }
 
-function addCreateStatus(boardId) {
+function addCreateStatus (boardId) {
     const addStatusButton = htmlFactory(htmlTemplates.addStatusButton);
     const addStatusButtonContent = addStatusButton(boardId)
     domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, addStatusButtonContent);
@@ -185,21 +185,21 @@ function addCreateStatus(boardId) {
     domManager.addEventListener(`#modalSubmitButton${boardId}`, "click", addColumn);
 }
 
-function addCreateCard(boardId) {
+function addCreateCard (boardId) {
     const addCreateCardButton = htmlFactory(htmlTemplates.addCreateCardButton);
     const addCreateCardButtonContent = addCreateCardButton(boardId);
     domManager.addChild(`.add-card-button-container${boardId}`, addCreateCardButtonContent);
     domManager.addEventListener(`.board-add-new-card[data-board-id="${boardId}"]`, "click", addCardInput);
 }
 
-async function deleteBoard(clickEvent) {
+async function deleteBoard (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     await dataHandler.deleteBoard(boardId);
     await reset();
 }
 
-async function deleteColumn(clickEvent) {
+async function deleteColumn (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
     const statusId = clickEvent.target.dataset.statusId;
     await dataHandler.deleteColumn(boardId, statusId);
@@ -209,7 +209,7 @@ async function deleteColumn(clickEvent) {
     await cardsManager.initDragAndDrop(boardId);
 }
 
-async function renameColumnHeandler(clickEvent) {
+async function renameColumnHeandler (clickEvent) {
     const statusId = clickEvent.target.dataset.statusId;
     const boardId = clickEvent.target.dataset.boardId;
     const renameColumnCurrentName = document.querySelector(`#columnName${statusId}`);
@@ -222,7 +222,7 @@ async function renameColumnHeandler(clickEvent) {
     document.querySelector(`#new-column-title-${statusId}`).focus()
 }
 
-async function keyDownOnRenameColumn(e) {
+async function keyDownOnRenameColumn (e) {
     const statusId = e.target.dataset.statusId;
     const boardId = e.target.dataset.boardId;
     if (e.key === 'Enter') {
@@ -241,7 +241,7 @@ async function keyDownOnRenameColumn(e) {
     }
 }
 
-async function cancelNameChange(e) {
+async function cancelNameChange (e) {
     const statusId = e.target.dataset.statusId;
     const inputField = document.querySelector(`#new-column-title-${statusId}`);
     const currentColumnName = document.querySelector(`#columnName${statusId}`);

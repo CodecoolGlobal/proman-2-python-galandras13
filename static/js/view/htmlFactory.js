@@ -8,7 +8,7 @@ export const htmlTemplates = {
     createNewCard: 7,
 }
 
-export function htmlFactory(template) {
+export function htmlFactory (template) {
     switch (template) {
         case htmlTemplates.board:
             return boardBuilder;
@@ -26,11 +26,13 @@ export function htmlFactory(template) {
             return createNewCardInputBuilder;
         default:
             console.error("Undefined template: " + template)
-            return () => { return "" }
+            return () => {
+                return ""
+            }
     }
 }
 
-function boardBuilder(board) {
+function boardBuilder (board) {
     return `<section class="board" data-board-id="${board.id}">
                 <div class="board-header" data-board-id="${board.id}">
                     <span class="board-title" data-board-id="${board.id}">${board.title}</span>
@@ -45,7 +47,7 @@ function boardBuilder(board) {
             </section>`
 }
 
-export function createNewBoardTitle(boardId = '') {
+export function createNewBoardTitle (boardId = '') {
     boardId = boardId ? `-${boardId}` : ""
     return `<input type="text" 
                     placeholder="Board Title" 
@@ -54,7 +56,7 @@ export function createNewBoardTitle(boardId = '') {
            <button id="submit-new-board-title${boardId}">Submit</button>`
 }
 
-export function newColumnTitle(boardId = "", statusId="") {
+export function newColumnTitle (boardId = "", statusId = "") {
     return `<input type="text" 
                     placeholder="Enter new column title" 
                     id="new-column-title-${statusId}"
@@ -63,7 +65,7 @@ export function newColumnTitle(boardId = "", statusId="") {
                     autofocus>`
 }
 
-export function newCardTitle(boardId = "", cardId = "") {
+export function newCardTitle (boardId = "", cardId = "") {
     return `<input type="text" 
                     placeholder="Enter new card title" 
                     id="new-card-title-${boardId}"
@@ -72,12 +74,12 @@ export function newCardTitle(boardId = "", cardId = "") {
                     autofocus>`
 }
 
-export function createNewBoard() {
+export function createNewBoard () {
     return `<input type="text" placeholder="Board Title" id="new-board-input-field" autofocus>
            <button id="new-board">Save</button>`
 }
 
-function cardBuilder(card) {
+function cardBuilder (card) {
     return `<div class="card" data-card-id="${card.id}" data-board-id="${card.board_id}">
                 <div class="card-title"  data-card-id="${card.id}" data-board-id="${card.board_id}">
                     <span class="cardName" data-card-id="${card.id}" data-board-id="${card.board_id}">${card.title}</span>
@@ -86,8 +88,8 @@ function cardBuilder(card) {
             </div>`;
 }
 
-function statusBuilder(status, boardId){
-    return`<div class="board-column">
+function statusBuilder (status, boardId) {
+    return `<div class="board-column">
                 <div class="board-column-title-${status.id} board-column-title-container">
                     <span id="columnName${status.id}" data-status-id="${status.id}" data-board-id="${boardId}">${status.title}</span>
                     <span class="delete-column-button"><i class="fas fa-trash-alt pointer" id="delete-column-button-${boardId}-${status.id}" data-board-id=${boardId} data-status-id=${status.id}></i></span>
@@ -97,14 +99,14 @@ function statusBuilder(status, boardId){
            </div>`
 }
 
-function addStatusBuilder(boardId) {
+function addStatusBuilder (boardId) {
     return `<div class="add-column-board-column">
                 <button type="button" class="add-column btn btn-info btn-lg" data-board-id="${boardId}" data-toggle="modal" data-target="#AddColumnModal${boardId}">+ Add column</button>
                 </div>
             </div>`
 }
 
-function addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId = null) {
+function addModalBuilder (modalTitle, modalLabelText, placeholderText, boardId = null) {
     return `
 <div class="modal fade" id="AddColumnModal${boardId}" role="dialog">
     <div class="modal-dialog">
@@ -126,11 +128,11 @@ function addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId = 
 </div>`
 }
 
-function addCreateCardBuilder(boardId) {
+function addCreateCardBuilder (boardId) {
     return `<button class="board-add-new-card" data-board-id="${boardId}">Create new card</button>`
 }
 
-export function createNewCardInputBuilder(boardId) {
+export function createNewCardInputBuilder (boardId) {
     return `<input type="text" placeholder="Card name" id="new-card-input-field${boardId}" data-board-id="${boardId}" autofocus>
            <button id="new-card${boardId}" class="" data-board-id="${boardId}" disabled>Save</button>`
 }
