@@ -216,7 +216,7 @@ def handle_socketio_drop_card(drop_card_data):
 
 
 def main():
-    socketio.run(app, debug=True, port=int(os.environ.get('PORT', '5000')))
+    socketio.run(app, debug=True, port=int(os.environ.get('PORT', '5000')), host='0.0.0.0')
 
     # Serving the favicon
     with app.app_context():
