@@ -11,6 +11,26 @@ load_dotenv()
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
+@app.route("/sw.js", methods=['GET'])
+def sw():
+    return app.send_static_file('sw.js')
+
+
+@app.route("/manifest.json")
+def manifest():
+    return app.send_static_file('manifest.json')
+
+
+@app.route("/index")
+def home():
+    return render_template('index.html')
+
+
+@app.route("/static/CSS/main.css", methods=['GET'])
+def css():
+    return app.send_static_file('CSS/main.css')
+
+
 @app.route("/")
 def index():
     """
@@ -198,7 +218,9 @@ def update_archives(card_id):
 
 
 def main():
-    app.run(debug=True)
+    app.run(debug=True
+            , host='0.0.0.0'
+            )
 
     # Serving the favicon
     with app.app_context():

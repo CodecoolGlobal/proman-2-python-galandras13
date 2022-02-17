@@ -1,0 +1,35 @@
+{
+  "name": "proMan",
+  "short_name": "proMan",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "favicon/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "favicon/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+      {
+      "src": "favicon/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "img/codecool-logo.png",
+      "sizes": "1000x1000",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "theme_color": "#000000",
+  "background_color": "#FFFFFF",
+  "display": "fullscreen",
+  "orientation": "portrait"
+}
