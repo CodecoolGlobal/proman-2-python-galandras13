@@ -43,7 +43,8 @@ CREATE TABLE cards (
     board_id    INTEGER             NOT NULL,
     status_id   INTEGER             NOT NULL,
     title       VARCHAR (200)       NOT NULL,
-    card_order  INTEGER             NOT NULL
+    card_order  INTEGER             NOT NULL,
+    archived    BOOLEAN             DEFAULT FALSE
 );
 
 CREATE TABLE users (
@@ -56,30 +57,73 @@ CREATE TABLE users (
 --- insert data
 ---
 
-INSERT INTO statuses(title, board_id) VALUES ('new', 1);
-INSERT INTO statuses(title, board_id) VALUES ('in progress', 1);
-INSERT INTO statuses(title, board_id) VALUES ('testing', 1);
-INSERT INTO statuses(title, board_id) VALUES ('done', 1);
-INSERT INTO statuses(title, board_id) VALUES ('new', 2);
-INSERT INTO statuses(title, board_id) VALUES ('in progress', 2);
-INSERT INTO statuses(title, board_id) VALUES ('testing', 2);
-INSERT INTO statuses(title, board_id) VALUES ('done', 2);
+INSERT INTO boards(title, user_id) VALUES ('ProMan', 1);
+INSERT INTO boards(title, user_id) VALUES ('Workflow', 1);
+INSERT INTO boards(title, user_id) VALUES ('You can try it!', 1);
+
+INSERT INTO statuses(title, board_id) VALUES ('Created by', 1);
+INSERT INTO statuses(title, board_id) VALUES ('New features', 1);
+INSERT INTO statuses(title, board_id) VALUES ('Monday', 2);
+INSERT INTO statuses(title, board_id) VALUES ('Tuesday', 2);
+INSERT INTO statuses(title, board_id) VALUES ('Wednesday', 2);
+INSERT INTO statuses(title, board_id) VALUES ('Thursday', 2);
+INSERT INTO statuses(title, board_id) VALUES ('', 3);
+INSERT INTO statuses(title, board_id) VALUES ('', 3);
+INSERT INTO statuses(title, board_id) VALUES ('', 3);
+INSERT INTO statuses(title, board_id) VALUES ('', 3);
+
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 1, 'András Gál', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 1, 'Márton Magai', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 1, 'Tamás Bosánszki', 3);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 1, '(+Gábor Hajdu)', 4);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'Archive cards', 1, true);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'History of changes', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'Manual sync', 3);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'Live sync', 4);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'Deployment', 5);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'Offline access', 6);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 3, 'Git flow', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 3, 'Merge previous sprint', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 4, 'Archive cards', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 4, 'Refactor using builder pattern', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 5, 'PA', 1, true);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 5, 'Manual sync', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 5, 'Session history', 3);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 6, 'Offline access', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 6, 'Live sync', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 6, 'Refactor', 3);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 6, 'Deploy', 4);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 3, 7, 'Thanks', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 3, 8, 'For', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 3, 9, 'Your', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 3, 10, 'Attention!', 1);
+
+
+INSERT INTO statuses(title, board_id) VALUES ('new', 4);
+INSERT INTO statuses(title, board_id) VALUES ('in progress', 4);
+INSERT INTO statuses(title, board_id) VALUES ('testing', 4);
+INSERT INTO statuses(title, board_id) VALUES ('done', 4);
+INSERT INTO statuses(title, board_id) VALUES ('new', 5);
+INSERT INTO statuses(title, board_id) VALUES ('in progress', 5);
+INSERT INTO statuses(title, board_id) VALUES ('testing', 5);
+INSERT INTO statuses(title, board_id) VALUES ('done', 5);
 
 INSERT INTO boards(title) VALUES ('Board 1');
 INSERT INTO boards(title) VALUES ('Board 2');
 
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 1, 'new card 1', 1);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 1, 'new card 2', 2);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'in progress card', 1);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 3, 'planning', 1);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 4, 'done card 1', 1);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 4, 'done card 1', 2);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 5, 'new card 1', 1);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 5, 'new card 2', 2);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 6, 'in progress card', 1);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 7, 'planning', 1);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 8, 'done card 1', 1);
-INSERT INTO cards VALUES (nextval('cards_id_seq'), 2, 8, 'done card 1', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 4, 11, 'new card 1', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 4, 11, 'new card 2', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 4, 12, 'in progress card', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 4, 13, 'planning', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 4, 14, 'done card 1', 1);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 4, 14, 'done card 1', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 4, 14, 'done card 1', 3);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 5, 15, 'new card 1', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 5, 15, 'new card 2', 3);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 5, 16, 'in progress card', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 5, 17, 'planning', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 5, 18, 'done card 1', 2);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 5, 18, 'done card 1', 3);
 
 INSERT INTO users(username, password)  VALUES ('admin', '$2b$12$T.dBeyku3wmmBW57N0qxkeIGU6shrmBJebokl0//0JhgXrqnRog4.');
 

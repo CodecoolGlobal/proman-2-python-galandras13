@@ -1,14 +1,9 @@
 import { dataHandler } from "../data/dataHandler.js";
-import {
-    createNewBoardTitle,
-    createNewBoard,
-    htmlFactory,
-    htmlTemplates,
-    newColumnTitle
-} from "../view/htmlFactory.js";
+import { htmlFactory, htmlTemplates } from "../view/htmlFactory.js";
 import { domManager } from "../view/domManager.js";
 import { cardsManager } from "./cardsManager.js";
 import { reset } from "../main.js";
+import { historyManager } from "./historyManager.js";
 import { websocketManager } from "./websocketManager.js";
 
 export let boardsManager = {
@@ -21,23 +16,30 @@ export let boardsManager = {
             domManager.addEventListener(`.board-header[data-board-id="${board.id}"]`, "click", showHideButtonHandler);
             domManager.addEventListener(`.board-title[data-board-id="${board.id}"]`, "click", renameTable);
             domManager.addEventListener(`.board-delete[data-board-id="${board.id}"]`, "click", deleteBoard);
+            domManager.addEventListener(`.show-archive[data-board-id="${board.id}"]`, "click", showArchivesModalHandler);
         }
     },
     loadStatuses: async function () {
-        return await dataHandler.getStatuses()
+        return await dataHandler.getStatuses();
     },
     createBoard: async function () {
         domManager.addEventListener('#create-new-board', "click", createBoardHandler);
     },
-    hideCards: async function (boardId) {
+    hideCards: async function (boardId, deleteModals = true) {
         const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-        const modalChild = document.querySelector(`#AddColumnModal${boardId}`);
+        const columnModalChild = document.querySelector(`#AddColumnModal${boardId}`);
+        const archivesModalChild = document.querySelector(`#AddArchiveModal${boardId}`);
         const createCardContainer = document.querySelector(`.add-card-button-container${boardId}`);
-        modalChild.parentElement.removeChild(modalChild);
+        const showArchivedButton = document.querySelector(`.show-archive[data-board-id="${boardId}"]`);
+        showArchivedButton.setAttribute("hidden", "");
+        if (deleteModals) {
+            columnModalChild.parentElement.removeChild(columnModalChild);
+            archivesModalChild.parentElement.removeChild(archivesModalChild);
+        }
         statusContainer.innerHTML = "";
         createCardContainer.innerHTML = "";
     },
-    showColumn: async function (boardId) {
+    showColumn: async function (boardId, deleteModals = true) {
         let statuses = await boardsManager.loadStatuses();
         statuses.sort(sortByStatusId);
         for (let status of statuses) {
@@ -45,34 +47,73 @@ export let boardsManager = {
                 const statusBuilder = htmlFactory(htmlTemplates.status);
                 const content = statusBuilder(status, boardId);
                 domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, content);
-                domManager.addEventListener(`#delete-column-button-${boardId}-${status.id}`, "click", deleteColumn)
-                domManager.addEventListener(`#columnName${status.id}`, "click", renameColumnHeandler);
+                domManager.addEventListener(`#delete-column-button-${boardId}-${status.id}`, "click", deleteColumn);
+                domManager.addEventListener(`#columnName${status.id}`, "click", renameColumnHandler);
             }
         }
-        addCreateStatus(boardId);
-        addCreateCard(boardId);
+        addCreateStatus(boardId, deleteModals);
+        addCreateCard(boardId, deleteModals);
+        if (deleteModals) {
+            await addShowArchivesModal(boardId);
+        }
     },
-    refreshBoard: async function (boardId) {
-        await boardsManager.hideCards(boardId);
-        await boardsManager.showColumn(boardId);
+    refreshBoard: async function (boardId, deleteModals = true) {
+        await boardsManager.hideCards(boardId, deleteModals);
+        await boardsManager.showColumn(boardId, deleteModals);
         await cardsManager.loadCards(boardId);
         await cardsManager.initDragAndDrop(boardId);
-    }
+    },
 };
 
 async function showHideButtonHandler (clickEvent) {
-    const boardId = clickEvent.target.dataset.boardId;
-    const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
-    const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
-    button.classList.toggle("rotate");
-    columContainer.classList.toggle("show-board-content");
-    if (columContainer.classList.contains("show-board-content")) {
-        await boardsManager.showColumn(boardId);
-        await cardsManager.loadCards(boardId);
-        await cardsManager.initDragAndDrop(boardId);
-    } else {
-        await boardsManager.hideCards(boardId);
+    if (clickEvent.target === clickEvent.currentTarget || clickEvent.target.classList.contains("fa-chevron-down")) {
+        const boardId = clickEvent.target.dataset.boardId;
+        const columContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
+        const button = document.querySelector(`.toggle-board-button[data-board-id="${boardId}"]`);
+        button.classList.toggle("rotate");
+        columContainer.classList.toggle("show-board-content");
+        if (columContainer.classList.contains("show-board-content")) {
+            await boardsManager.showColumn(boardId);
+            await cardsManager.loadCards(boardId);
+            await cardsManager.initDragAndDrop(boardId);
+        } else {
+            await boardsManager.hideCards(boardId);
+        }
     }
+}
+
+const addShowArchivesModal = async (boardId) => {
+    const modalTitle = "Archived cards";
+    const addModalBuilder = htmlFactory(htmlTemplates.addModal);
+    const addModalArchiveBodyBuilder = htmlFactory(htmlTemplates.addModalArchiveBody);
+    const modalContent = addModalBuilder(modalTitle, "Archive", boardId);
+    const modalContentBody = addModalArchiveBodyBuilder(boardId);
+    domManager.addChild(`#modalContainer`, modalContent);
+    domManager.addChild(`.modal-body-Archive-${boardId}`, modalContentBody);
+}
+
+const showArchivesModalHandler = async (e) => {
+    const boardId = e.target.dataset.boardId;
+    const archivedCardLi = document.querySelector(`.archived-cards-${boardId}`);
+    archivedCardLi.innerHTML = "";
+    const archivedCards = await dataHandler.getArchived(boardId);
+    for (let archivedCard of archivedCards) {
+        const addModalArchiveCardBuilder = htmlFactory(htmlTemplates.addModalArchiveCard);
+        const modalCardContent = addModalArchiveCardBuilder(archivedCard);
+        domManager.addChild(`.archived-cards-${boardId}`, modalCardContent);
+        const unArchiveButton = document.querySelector(`.un-archive[data-card-id="${archivedCard.id}"]`);
+        unArchiveButton.classList.add("pointer");
+        domManager.addEventListener(`.un-archive[data-card-id="${archivedCard.id}"]`, "click", unArchiveHandler);
+    }
+}
+
+const unArchiveHandler = async (e) => {
+    const cardId = e.target.dataset.cardId;
+    const boardId = e.target.dataset.boardId;
+    await dataHandler.updateArchives(cardId, true);
+    const archivedCard = document.querySelector(`.archived-card-li-${cardId}`);
+    archivedCard.parentElement.removeChild(archivedCard);
+    await boardsManager.refreshBoard(boardId, false);
 }
 
 function sortByStatusId (a, b) {
@@ -87,13 +128,14 @@ function sortByStatusId (a, b) {
 
 function renameTable (clickEvent) {
     const boardId = clickEvent.target.dataset.boardId;
-    const selectorString = `.board-title[data-board-id="${boardId}"]`
-    const rename = document.querySelector(selectorString)
-    rename.innerHTML = createNewBoardTitle(boardId)
+    const selectorString = `.board-title[data-board-id="${boardId}"]`;
+    const rename = document.querySelector(selectorString);
+    const createNewBoardTitle = htmlFactory(htmlTemplates.createNewBoardTitle);
+    rename.innerHTML = createNewBoardTitle(boardId);
     domManager.addEventListener(`#submit-new-board-title-${boardId}`, 'click', async () => {
-        const updatedBoardTitle = document.querySelector(`#new-board-title-${boardId}`).value
-        await dataHandler.updateBoardTitle(boardId, updatedBoardTitle)
-        await reset()
+        const updatedBoardTitle = document.querySelector(`#new-board-title-${boardId}`).value;
+        await dataHandler.updateBoardTitle(boardId, updatedBoardTitle);
+        await reset();
     })
 }
 
@@ -105,19 +147,37 @@ async function addCardInput (clickEvent) {
     const createCardButton = document.querySelector(`.board-add-new-card[data-board-id="${boardId}"]`);
     createCardButton.classList.add("hidden");
     domManager.addChild(`.add-card-button-container${boardId}`, createNewCardInputContent);
-    domManager.addEventListener(`#new-card${boardId}`, "click", addCard);
+    domManager.addEventListener(`#new-card${boardId}`, "click", addCardHandler);
     domManager.addEventListener(`#new-card-input-field${boardId}`, "input", checkCreateCardInput);
     domManager.addEventListener(`#new-card-input-field${boardId}`, "click", noClickEvent);
 }
 
-async function addCard (clickEvent) {
+async function addCardHandler (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const createCardInputField = document.querySelector(`#new-card-input-field${boardId}`);
-    const newCardName = createCardInputField.value;
+    let newCardName = createCardInputField.value;
+    await addCardHistoryHandler(createCardInputField, boardId, newCardName);
+    await historyManager.showHistory()
     await dataHandler.createNewCard(boardId, newCardName);
     websocketManager.sendNewCard(boardId, newCardName);
     await boardsManager.refreshBoard(boardId);
+}
+
+const addCardHistoryHandler = async (createCardInputField, boardId, newCardName) => {
+    const board = await dataHandler.getBoard(boardId);
+    const sessionStorageCreateCardContent = { 'cardName': newCardName, 'boardName': board.title };
+
+    if (sessionStorage.getItem("0-historyIndex")) {
+        let historyLength = +sessionStorage.getItem("0-historyIndex") + 1;
+        sessionStorage.setItem("0-historyIndex", `${historyLength}`);
+    } else {
+        sessionStorage.setItem("0-historyIndex", "1")
+    }
+
+    sessionStorage.setItem(`${sessionStorage.getItem("0-historyIndex")}-newCard`, JSON.stringify(sessionStorageCreateCardContent));
+    let historyLength = sessionStorage.getItem("0-historyIndex");
+    sessionStorage.setItem("0-historyIndex", `${historyLength}`);
 }
 
 async function addColumn (clickEvent) {
@@ -150,6 +210,7 @@ function createBoardHandler (clickEvent) {
 
     if (!document.querySelector(inputFieldSelector)) {
         createButton.classList.toggle('hidden');
+        const createNewBoard = htmlFactory(htmlTemplates.createNewBoard);
         const textBox = createNewBoard();
         buttonSpan.insertAdjacentHTML('afterbegin', textBox);
         const inputField = document.querySelector(inputFieldSelector);
@@ -171,18 +232,23 @@ function hideForm (createButton, inputField, submitButton) {
     createButton.classList.toggle('hidden');
 }
 
-function addCreateStatus (boardId) {
+function addCreateStatus (boardId, deleteModals) {
     const addStatusButton = htmlFactory(htmlTemplates.addStatusButton);
-    const addStatusButtonContent = addStatusButton(boardId)
+    const addStatusButtonContent = addStatusButton(boardId);
     domManager.addChild(`.board-columns[data-board-id="${boardId}"]`, addStatusButtonContent);
-    const addModalBuilder = htmlFactory(htmlTemplates.addModal);
-    const modalTitle = "Add a column";
-    const modalLabelText = "Column name";
-    const placeholderText = "Enter a column name (To Do, in Progress, Done)";
-    const modalContent = addModalBuilder(modalTitle, modalLabelText, placeholderText, boardId);
-    domManager.addChild(`#modalContainer`, modalContent);
-    domManager.addEventListener(`#modalInputId${boardId}`, "input", checkInput);
-    domManager.addEventListener(`#modalSubmitButton${boardId}`, "click", addColumn);
+    if (deleteModals) {
+        const addModalBuilder = htmlFactory(htmlTemplates.addModal);
+        const addColumnModalBody = htmlFactory(htmlTemplates.addColumnModalBody);
+        const modalTitle = "Add a column";
+        const modalLabelText = "Column name";
+        const placeholderText = "Enter a column name (To Do, in Progress, Done)";
+        const modalContent = addModalBuilder(modalTitle, "Column", boardId);
+        const modalContentBody = addColumnModalBody(boardId, modalLabelText, placeholderText);
+        domManager.addChild(`#modalContainer`, modalContent);
+        domManager.addChild(`.modal-body-Column-${boardId}`, modalContentBody);
+        domManager.addEventListener(`#modalInputId${boardId}`, "input", checkInput);
+        domManager.addEventListener(`#modalSubmitButton${boardId}`, "click", addColumn);
+    }
 }
 
 function addCreateCard (boardId) {
@@ -209,17 +275,18 @@ async function deleteColumn (clickEvent) {
     await cardsManager.initDragAndDrop(boardId);
 }
 
-async function renameColumnHeandler (clickEvent) {
+async function renameColumnHandler (clickEvent) {
     const statusId = clickEvent.target.dataset.statusId;
     const boardId = clickEvent.target.dataset.boardId;
     const renameColumnCurrentName = document.querySelector(`#columnName${statusId}`);
     renameColumnCurrentName.classList.add("hidden");
+    const newColumnTitle = htmlFactory(htmlTemplates.newColumnTitle);
     const renameColumnContent = newColumnTitle(boardId, statusId);
     domManager.addChildAfterBegin(`.board-column-title-${statusId}`, renameColumnContent);
     domManager.addEventListener(`#new-column-title-${statusId}`, "keydown", keyDownOnRenameColumn);
     domManager.addEventListener(`#new-column-title-${statusId}`, "click", noClickEvent);
-    domManager.addEventListener(`#new-column-title-${statusId}`, "focusout", cancelNameChange)
-    document.querySelector(`#new-column-title-${statusId}`).focus()
+    domManager.addEventListener(`#new-column-title-${statusId}`, "focusout", cancelNameChange);
+    document.querySelector(`#new-column-title-${statusId}`).focus();
 }
 
 async function keyDownOnRenameColumn (e) {
@@ -227,13 +294,11 @@ async function keyDownOnRenameColumn (e) {
     const boardId = e.target.dataset.boardId;
     if (e.key === 'Enter') {
         if (e.target.value) {
-            console.log("ENTER")
             const modifiedTitle = document.querySelector(`#new-column-title-${statusId}`).value;
             await dataHandler.renameColumn(statusId, modifiedTitle);
             await boardsManager.refreshBoard(boardId);
         }
     } else if (e.key === "Escape") {
-        console.log("ESC")
         const inputField = document.querySelector(`#new-column-title-${statusId}`);
         const currentColumnName = document.querySelector(`#columnName${statusId}`);
         inputField.parentElement.removeChild(inputField);
@@ -245,9 +310,6 @@ async function cancelNameChange (e) {
     const statusId = e.target.dataset.statusId;
     const inputField = document.querySelector(`#new-column-title-${statusId}`);
     const currentColumnName = document.querySelector(`#columnName${statusId}`);
-    console.log("cancel")
-    console.log(inputField)
-    console.log(inputField.parentElement)
     inputField.parentElement.removeChild(inputField);
     currentColumnName.classList.remove("hidden");
 }

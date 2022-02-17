@@ -186,6 +186,19 @@ def add_new_column():
     return jsonify_dict({'message': f" Failed to add new column in board with id:{board_id}."})
 
 
+@app.route("/api/get-archived/<board_id>")
+@json_response
+def get_archived(board_id):
+    return queires.get_archived(board_id)
+
+
+@app.route("/api/cards/archive/<card_id>", methods=['PUT'])
+def update_archives(card_id):
+    archives = request.get_json()["archive"]
+    queires.update_archives(card_id, archives)
+    return "#"
+
+
 @socketio.on('create_card')
 def handle_socketio_create_card(create_card_data):
     emit('something_happened', {'boardId': create_card_data['boardId']}, broadcast=True, include_self=False)

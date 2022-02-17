@@ -39,17 +39,29 @@
         {% if not session.username %}
             <a id="registration" href="/registration">Register</a>
             <a id="login" href="/login">Login</a>
+            <i onClick="window.location.href=window.location.href" class="fas fa-redo refresh pointer"></i>
             <span id="add-new-board"><button id="create-new-board" data-user-id="">Create new board</button></span>
         {% else %}
+            <i onClick="window.location.href=window.location.href" class="fas fa-redo refresh pointer"></i>
             <span id="welcome">Welcome, {{ session.username }}.</span>
             <a id="logout" href="/logout">Logout</a>
+
             <span id="add-new-board"><button id="create-new-board" data-user-id="{{ session.id }}">Create new private board</button></span>
         {% endif %}
         <div class="dot"></div>
     </nav>
 </div>
 
-<div id="root"></div>
+<div class="content-container">
+
+    <div id="root"></div>
+
+    <div class="session-history-container">
+        <div class="session-history">
+            <ol class="session-history-list"></ol>
+        </div>
+    </div>
+</div>
 
 <div id="modalContainer"></div>
 

@@ -87,7 +87,7 @@ section.board {
     /*This only works if the tag is really empty and there is not even whitespace inside*/
     border: 4px solid #cdcdcd;
     margin-top: 4px;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     background: #eee;
 }
 
@@ -97,6 +97,14 @@ section.board {
 
 .card {
     position: relative;
+    background: #222;
+    color: #fff;
+    border-radius: var(--border-radius);
+    margin: 4px 0;
+    padding: 4px;
+}
+
+.archived-card {
     background: #222;
     color: #fff;
     border-radius: var(--border-radius);
@@ -123,14 +131,23 @@ section.board {
 .card-remove {
     display: block;
     position: absolute;
-    top: 4px;
+    top: 7px;
     right: 4px;
     font-size: 12px;
     cursor: pointer;
 }
 
+.archive-add {
+    display: block;
+    position: absolute;
+    top: 7px;
+    right: 20px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
 .card-title {
-    padding-right: 16px;
+    padding-right: 36px;
 }
 
 /*NAVBAR*/
@@ -168,14 +185,17 @@ section.board {
 
 #registration {
     margin-left: 30px;
+    margin-bottom: 10px;
 }
 
 #login {
     margin-left: 50px;
+    margin-bottom: 10px;
 }
 
 #logout {
     margin-left: 40%;
+    margin-bottom: 8px;
 }
 
 #welcome {
@@ -191,6 +211,13 @@ section.board {
     margin-top: 5px;
     width: 50px;
     height: 50px;
+}
+
+.refresh {
+    background: #ddd url(http://cdn.backgroundhost.com/backgrounds/subtlepatterns/diagonal-noise.png);
+    color: black;
+    margin-bottom: 15px;
+    margin-left: 5px;
 }
 
 /*NAVBAR*/
@@ -240,7 +267,7 @@ section.board {
     margin: 20px 10px;
 }
 
-.modal-body{
+.modal-body {
     display: flex;
     flex-direction: column;
     min-height: 10rem;
@@ -267,11 +294,11 @@ section.board {
     cursor: pointer;
 }
 
-.add-card-button-container{
+.add-card-button-container {
     margin-left: 5rem;
 }
 
-.board-header{
+.board-header {
     /*display:flex;*/
     align-items: center;
     /*width: 100%;*/
@@ -292,4 +319,29 @@ section.board {
 
 input {
     color: black;
+}
+
+li {
+    width: fit-content;
+    max-width: 90%;
+}
+
+.session-history {
+    background-color: #ffffff90;
+    border-radius: var(--border-radius);
+    max-width: 500px;
+    /*height: 200px;*/
+    margin:20px;
+}
+
+.content-container {
+    display: flex;
+    flex-flow: row;
+    justify-content: right;
+}
+
+#root {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
 }
