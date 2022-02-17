@@ -19,16 +19,11 @@ def establish_connection(connection_data=None):
         connect_str = os.environ.get('DATABASE_URL')
         conn = psycopg2.connect(connect_str)
         conn.autocommit = True
-    except:
-        try:
-            connect_str = os.environ.get('DATABASE_URL')
-            conn = psycopg2.connect(connect_str)
-            conn.autocommit = True
-        except psycopg2.DatabaseError as e:
-            print("Cannot connect to database.")
-            print(e)
-        else:
-            return conn
+    except psycopg2.DatabaseError as e:
+        print("Cannot connect to database.")
+        print(e)
+    else:
+        return conn
 
 
 def get_connection_data(db_name=None):
