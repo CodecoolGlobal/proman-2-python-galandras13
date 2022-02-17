@@ -5,6 +5,7 @@ from flask_socketio import SocketIO, emit
 from util import json_response, hash_password, check_password, jsonify_dict
 import mimetypes
 import queires
+import os
 
 mimetypes.add_type('application/javascript', '.js')
 app = Flask(__name__)
@@ -215,7 +216,7 @@ def handle_socketio_drop_card(drop_card_data):
 
 
 def main():
-    socketio.run(app, debug=True, port=5002)
+    socketio.run(app, debug=True, port=int(os.environ.get('PORT', '5000')))
 
     # Serving the favicon
     with app.app_context():
