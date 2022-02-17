@@ -2,6 +2,7 @@ import {dataHandler} from "../data/dataHandler.js";
 import {htmlFactory, htmlTemplates, newCardTitle} from "../view/htmlFactory.js";
 import {domManager} from "../view/domManager.js";
 import {boardsManager, noClickEvent} from "./boardsManager.js";
+import { websocketManager } from "./websocketManager.js";
 
 const ui = {
     slots: null,
@@ -26,6 +27,23 @@ export let cardsManager = {
     }, initDragAndDrop: async function (boardId) {
         await initElements(boardId);
         await initDragEvents();
+    },
+    showCurrentlyDraggedCard (cardId, position) {
+      const card = document.querySelector(`[data-card-id="${cardId}"]`);
+      card.classList.add('currently-dragged-by-another-user');
+      cardsManager.copyCard(card, position);
+    },
+    copyCard (card, position) {
+      let cardCopy = document.querySelector(`.card-copy[data-card-id="${card.dataset.cardId}"]`);
+      if (cardCopy == null) {
+        const copyOfCardHtml = `<div class="card hidden card-copy" data-card-id="${card.dataset.cardId}">${card.innerHTML}</div>`;
+        document.body.insertAdjacentHTML('afterbegin', copyOfCardHtml);
+        cardCopy = document.querySelector(`.card-copy[data-card-id="${card.dataset.cardId}"]`);
+      }
+
+      cardCopy.style.left = `${position.x - 35}px`;
+      cardCopy.style.top = `${position.y - 25}px`;
+      cardCopy.classList.remove('hidden');
     }
 };
 
@@ -110,6 +128,7 @@ function initDragEvents() {
 function initDraggable(draggable) {
     draggable.addEventListener("dragstart", handleDragStart);
     draggable.addEventListener("dragend", handleDragEnd);
+    document.addEventListener("drag", handleDrag, false);
 }
 
 function initDropzone(dropzone) {
@@ -143,6 +162,10 @@ async function handleDragEnd() {
         }
     }
     game.dragged = null;
+}
+
+function handleDrag(e) {
+  websocketManager.sendCardPosition(e.target.dataset.cardId, { x: e.clientX, y: e.clientY })
 }
 
 function handleDragEnter(e) {

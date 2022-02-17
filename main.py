@@ -186,14 +186,14 @@ def add_new_column():
     return jsonify_dict({'message': f" Failed to add new column in board with id:{board_id}."})
 
 
-@socketio.on('my event')
-def handle_socketio_my_custom_event(json):
-    print('received json: ' + str(json))
-
-
 @socketio.on('create_card')
-def handle_socketio_create_card(card):
-    emit('something_happened', {'boardId': card['data']['boardId']}, broadcast=True)
+def handle_socketio_create_card(create_card_data):
+    emit('something_happened', {'boardId': create_card_data['boardId']}, broadcast=True, include_self=False)
+
+
+@socketio.on('move_card')
+def handle_socketio_move_card(move_card_data):
+    emit('move_card', {'cardId': move_card_data['cardId'], 'position': move_card_data['position']}, broadcast=True, include_self=False)
 
 
 def main():
