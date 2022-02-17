@@ -153,7 +153,7 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
-    'http://cdn.backgroundhost.com/backgrounds/subtlepatterns/diagonal-noise.png',
+    new RegExp('(http|https)://cdn.backgroundhost.com/backgrounds/subtlepatterns/diagonal-noise.png'),
     workbox.strategies.networkFirst({
         cacheName: 'background-png'
     })
