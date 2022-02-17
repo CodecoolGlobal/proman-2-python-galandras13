@@ -80,13 +80,13 @@ function boardBuilder (board) {
 }
 
 export function createNewBoardTitle (boardId = '') {
-    boardId = boardId ? `-${boardId}` : ""
+    let boardIdWithDash = boardId ? `-${boardId}` : ""
     return `<input type="text" 
                     placeholder="Board Title" 
-                    id="new-board-title${boardId}"
+                    id="new-board-title${boardIdWithDash}"
                     data-board-id="${boardId}"
                     autofocus>
-           <button id="submit-new-board-title${boardId}" data-board-id="${boardId}">Submit</button>`;
+           <button id="submit-new-board-title${boardIdWithDash}" data-board-id="${boardId}">Submit</button>`;
 }
 
 export function newColumnTitle (boardId = "", statusId = "") {
