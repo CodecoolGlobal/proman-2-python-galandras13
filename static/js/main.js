@@ -15,17 +15,32 @@ export async function reset () {
     await init();
 }
 
-await init();
+const registerSW = () => {
+    let boardIds = [];
+    let cardURLs = [];
 
-let boardIds = [];
-let cardURLs = [];
-async function getIds() {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('../sw.js', {}).then(function () {
+                return navigator.serviceWorker.ready;
+            }).then(function (registration) {
+                console.log('Registration successful, scope is:', registration.scope);
+
+                getIds(boardIds, cardURLs).then(function () {
+                    registration.active.postMessage(JSON.stringify(cardURLs));
+                });
+            }).catch(function (error) {
+                console.log('Service worker registration failed, error:', error);
+            });
+        });
+    }
+}
+
+const getIds = async (boardIds, cardURLs) => {
     const boards = document.querySelectorAll(".board");
-    // console.log(boards);
     for (const board of boards) {
         boardIds.push(board.dataset.boardId);
     }
-    // console.log(boardIds);
     for (const boardId of boardIds) {
         cardURLs.push(
             `/api/boards/${boardId}/cards/`
@@ -33,22 +48,4 @@ async function getIds() {
     }
 }
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-        navigator.serviceWorker.register('../sw.js', {
-            // scope: '/'
-        }).then(function () {
-            return navigator.serviceWorker.ready;
-        })
-            .then(function (registration) {
-                console.log('Registration successful, scope is:', registration.scope);
-
-                getIds().then(function (){
-                    registration.active.postMessage(JSON.stringify(cardURLs));
-                });
-            })
-            .catch(function (error) {
-                console.log('Service worker registration failed, error:', error);
-            });
-    });
-}
+await init().then(registerSW);

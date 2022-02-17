@@ -62,33 +62,30 @@ importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox
 workbox.skipWaiting();
 workbox.clientsClaim();
 
-// cache name
 workbox.core.setCacheNameDetails({
-    prefix: 'My-awesome-cache',
+    prefix: 'ProMan-cache',
     precache: 'precache',
     runtime: 'runtime',
-  });
+});
 
-// runtime cache
-// 1. stylesheet
 workbox.routing.registerRoute(
     new RegExp('\.css$'),
     workbox.strategies.networkFirst({
-        cacheName: 'My-awesome-cache-Stylesheets',
+        cacheName: 'ProMan-cache-Stylesheets',
         plugins: [
             new workbox.expiration.Plugin({
-                maxAgeSeconds: 60 * 60 * 24 * 7, // cache for one week
-                maxEntries: 20, // only cache 20 request
+                maxAgeSeconds: 60 * 60 * 24 * 7,
+                maxEntries: 20,
                 purgeOnQuotaError: true
             })
         ]
     })
 );
-// 2. images
+
 workbox.routing.registerRoute(
     new RegExp('\.(png|svg|jpg|jpeg)$'),
     workbox.strategies.networkFirst({
-        cacheName: 'My-awesome-cache-Images',
+        cacheName: 'ProMan-cache-Images',
         plugins: [
             new workbox.expiration.Plugin({
                 maxAgeSeconds: 60 * 60 * 24 * 7,
@@ -99,65 +96,65 @@ workbox.routing.registerRoute(
     })
 );
 
-// 3. cache news articles result
 workbox.routing.registerRoute(
     new RegExp('/'),
     workbox.strategies.networkFirst({
-        cacheName: 'My-awesome-cache-main-page',
-        cacheExpiration: {
-            maxAgeSeconds: 60 * 30 //cache the news content for 30mn
-        }
+        cacheName: 'ProMan-cache-main-page'
+        // ,
+        // cacheExpiration: {
+        //     maxAgeSeconds: 60 * 30 //cache the news content for 30mn
+        // }
     })
 );
 
 workbox.routing.registerRoute(
-    'https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css',
+    new RegExp('https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css'),
     workbox.strategies.networkFirst({
         cacheName: 'bs-css'
     })
 );
 
 workbox.routing.registerRoute(
-    'https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css',
+    new RegExp('https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css'),
     workbox.strategies.networkFirst({
         cacheName: 'normalize-css'
     })
 );
 
 workbox.routing.registerRoute(
-    'https://use.fontawesome.com/releases/v5.5.0/css/solid.css',
+    new RegExp('https://use.fontawesome.com/releases/v5.5.0/css/solid.css'),
     workbox.strategies.networkFirst({
         cacheName: 'solid-css'
     })
 );
 
 workbox.routing.registerRoute(
-    'https://use.fontawesome.com/releases/v5.5.0/css/fontawesome.css',
+    new RegExp('https://use.fontawesome.com/releases/v5.5.0/css/fontawesome.css'),
     workbox.strategies.networkFirst({
         cacheName: 'fontawesome-css'
     })
 );
 
 workbox.routing.registerRoute(
-    'https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js',
+    new RegExp('https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js'),
     workbox.strategies.networkFirst({
         cacheName: 'jquery-js'
     })
 );
 
 workbox.routing.registerRoute(
-    'https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js',
+    new RegExp('https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'),
     workbox.strategies.networkFirst({
         cacheName: 'bs-js'
     })
 );
 
-workbox.routing.registerRoute(
-    new RegExp('(http|https)://cdn.backgroundhost.com/backgrounds/subtlepatterns/diagonal-noise.png'),
-    workbox.strategies.networkFirst({
-        cacheName: 'background-png'
-    })
-);
+// workbox.routing.registerRoute(
+//     new RegExp('(http|https)://cdn.backgroundhost.com/backgrounds/subtlepatterns/diagonal-noise.png'),
+//     workbox.strategies.networkFirst({
+//         cacheName: 'background-png'
+//     })
+// );
 
 workbox.routing.registerRoute(
     new RegExp('https://use.fontawesome.com/releases/v5.5.0/webfonts/'),
