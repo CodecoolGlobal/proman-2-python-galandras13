@@ -1,8 +1,11 @@
 import { boardsManager } from "./controller/boardsManager.js";
+import { historyManager } from "./controller/historyManager.js";
 
-function init () {
-    boardsManager.loadBoards();
-    boardsManager.createBoard();
+
+async function init () {
+    await boardsManager.loadBoards();
+    await boardsManager.createBoard();
+    await historyManager.showHistory();
 }
 
 export async function reset () {
@@ -11,4 +14,4 @@ export async function reset () {
     await init();
 }
 
-init();
+await init();

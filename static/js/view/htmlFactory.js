@@ -13,6 +13,8 @@ export const htmlTemplates = {
     newCardTitle: 12,
     createNewBoardTitle: 13,
     createNewBoard: 14,
+    showHistory: 15,
+    showHistoryUpdate: 16,
 }
 
 export function htmlFactory (template) {
@@ -45,6 +47,10 @@ export function htmlFactory (template) {
             return createNewBoardTitle;
         case htmlTemplates.createNewBoard:
             return createNewBoard;
+        case htmlTemplates.showHistory:
+            return showHistoryBuilder;
+        case htmlTemplates.showHistoryUpdate:
+            return showHistoryUpdateBuilder
         default:
             console.error("Undefined template: " + template)
             return () => {
@@ -91,12 +97,13 @@ function newColumnTitle (boardId = "", statusId = "") {
                     autofocus>`;
 }
 
-function newCardTitle (boardId = "", cardId = "") {
+function newCardTitle (boardId = "", cardId = "", currentCardTitle="", statusId="") {
     return `<input type="text" 
-                    placeholder="Enter new card title" 
+                    placeholder="${currentCardTitle}" 
                     id="new-card-title-${boardId}"
                     data-board-id="${boardId}"
                     data-card-id="${cardId}"
+                    data-status-id="${statusId}"
                     autofocus>`;
 }
 
@@ -108,12 +115,12 @@ function createNewBoard () {
 function cardBuilder (card) {
     return `<div class="card" data-card-id="${card.id}" data-board-id="${card.board_id}">
                 <div class="card-title"  data-card-id="${card.id}" data-board-id="${card.board_id}">
-                    <span class="cardName" data-card-id="${card.id}" data-board-id="${card.board_id}">${card.title}</span>
+                    <span class="cardName" data-card-id="${card.id}" data-board-id="${card.board_id}" data-status-id="${card.status_id}">${card.title}</span>
                 </div>
                 <div class="archive-add" data-card-id="${card.id}" data-board-id="${card.board_id}">
                     <i class="fas fa-archive"></i>
                 </div>
-                <div class="card-remove" data-card-id="${card.id}" data-board-id="${card.board_id}">
+                <div class="card-remove" data-card-id="${card.id}" data-board-id="${card.board_id}" data-card-title="${card.title}">
                     <i class="fas fa-trash-alt"></i>
                 </div>
             </div>`;
@@ -161,7 +168,6 @@ function addModalBuilder (modalTitle, type, boardId = null) {
     return modalContent;
 }
 
-
 const addModalColumnBodyBuilder = (boardId, modalLabelText, placeholderText) => {
     return `<label for="modalInputId${boardId}">${modalLabelText}</label>
             <input type="text" id="modalInputId${boardId}" placeholder="${placeholderText}" minLength="1" data-board-id="${boardId}"
@@ -187,4 +193,16 @@ const addModalArchiveCardBuilder = (archivedCard) => {
                     <i class="un-archive fas fa-archive" data-card-id="${archivedCard.id}" data-board-id="${archivedCard.board_id}"></i>
                 </div>
             </div></li>`;
+}
+
+const showHistoryBuilder = (action, boardName, cardName) => {
+    return `<li>
+                <span>${cardName} card in board: ${boardName} has been ${action}!</span>
+            </li>`
+}
+
+const showHistoryUpdateBuilder = (statusName, modifiedTitle, previousTitle) => {
+    return `<li>
+                <span>${previousTitle} has been renamed to: ${modifiedTitle} at ${statusName} column!</span>
+            </li>`
 }
