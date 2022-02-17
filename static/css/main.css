@@ -214,7 +214,7 @@ section.board {
 }
 
 .refresh {
-    background: #ddd url(http://cdn.backgroundhost.com/backgrounds/subtlepatterns/diagonal-noise.png);
+    background: #ddd url('../img/diagonal-noise.png');
     color: black;
     margin-bottom: 15px;
     margin-left: 5px;
