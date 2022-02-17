@@ -65,6 +65,7 @@ export let dataHandler = {
 async function apiGet (url) {
     let response = await fetch(url, {
         method: "GET",
+        mode: "no-cors"
     });
     if (response.status === 200) {
         return response.json();
@@ -78,6 +79,7 @@ async function apiPost (url, payload) {
             'Content-Type': 'application/json'
         },
         method: 'POST',
+        mode: "no-cors",
         body: JSON.stringify(payload)
     });
 
@@ -90,6 +92,7 @@ async function apiDelete (url, payload = "") {
             'Content-Type': 'application/json'
         },
         method: 'DELETE',
+        mode: "no-cors",
         body: JSON.stringify(payload)
     });
 }
@@ -101,6 +104,7 @@ async function apiPut (url, payload = "") {
             'Content-Type': 'application/json'
         },
         method: 'PUT',
+        mode: "no-cors",
         body: JSON.stringify(payload)
     });
 }
