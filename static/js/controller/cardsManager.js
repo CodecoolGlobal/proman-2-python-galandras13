@@ -48,8 +48,8 @@ export let cardsManager = {
             cardCopy = document.querySelector(`.card-copy[data-card-id="${card.dataset.cardId}"]`);
         }
 
-        cardCopy.style.left = `${position.x - 35}px`;
-        cardCopy.style.top = `${position.y - 25}px`;
+        cardCopy.style.left = `${position.x + 48}px`;
+        cardCopy.style.top = `${position.y - 16}px`;
         cardCopy.classList.remove('hidden');
     }
 };
@@ -136,7 +136,7 @@ async function deleteCardHandler (clickEvent) {
     const boardId = clickEvent.currentTarget.dataset.boardId;
     const cardId = clickEvent.currentTarget.dataset.cardId;
     const cardName = clickEvent.currentTarget.dataset.cardTitle;
-    await deleteCardHistoryHandler(cardName, boardId, );
+    await deleteCardHistoryHandler(cardName, boardId);
     await historyManager.showHistory()
     await dataHandler.deleteCard(cardId);
     await boardsManager.hideCards(boardId);
@@ -145,7 +145,7 @@ async function deleteCardHandler (clickEvent) {
     await cardsManager.initDragAndDrop(boardId);
 }
 
-const deleteCardHistoryHandler = async (cardName, boardId, ) => {
+const deleteCardHistoryHandler = async (cardName, boardId) => {
 
     const board = await dataHandler.getBoard(boardId);
     const sessionStorageModifyCardContent = { 'cardName': cardName, 'boardName': board.title };
@@ -224,14 +224,12 @@ async function handleDragEnd () {
                 'card_order': cardOrder,
                 'status_id': statusId
             };
-            console.log(card);
-            console.log("fuck");
-            // card.dataset.statusId = statusId;
 
             card.children[0].children[0].setAttribute(`data-status-id`, `${statusId}`);
             await dataHandler.updateCards(payload);
         }
     }
+    websocketManager.sendCardDropped(boardId);
     game.dragged = null;
 }
 

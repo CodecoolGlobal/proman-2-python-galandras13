@@ -26,6 +26,10 @@ export let boardsManager = {
         domManager.addEventListener('#create-new-board', "click", createBoardHandler);
     },
     hideCards: async function (boardId, deleteModals = true) {
+        const cardCopy = document.querySelector('.card-copy');
+        if (cardCopy != null) {
+            cardCopy.remove();
+        }
         const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
         const columnModalChild = document.querySelector(`#AddColumnModal${boardId}`);
         const archivesModalChild = document.querySelector(`#AddArchiveModal${boardId}`);

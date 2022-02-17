@@ -19,6 +19,9 @@ export const websocketManager = {
     },
     sendCardPosition: function (cardId, position) {
         this.socket.emit('move_card', { cardId, position });
+    },
+    sendCardDropped (boardId) {
+        this.socket.emit('drop_card', { boardId });
     }
 }
 

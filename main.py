@@ -209,8 +209,13 @@ def handle_socketio_move_card(move_card_data):
     emit('move_card', {'cardId': move_card_data['cardId'], 'position': move_card_data['position']}, broadcast=True, include_self=False)
 
 
+@socketio.on('drop_card')
+def handle_socketio_drop_card(drop_card_data):
+    emit('something_happened', {'boardId': drop_card_data['boardId']}, broadcast=True, include_self=False)
+
+
 def main():
-    socketio.run(app, debug=True, port=5001)
+    socketio.run(app, debug=True, port=5002)
 
     # Serving the favicon
     with app.app_context():
