@@ -101,7 +101,7 @@ workbox.routing.registerRoute(
 
 // 3. cache news articles result
 workbox.routing.registerRoute(
-    new RegExp('http://127.0.0.1:5000/'),
+    new RegExp('/'),
     workbox.strategies.networkFirst({
         cacheName: 'My-awesome-cache-main-page',
         cacheExpiration: {
