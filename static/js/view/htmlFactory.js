@@ -97,7 +97,7 @@ export function newColumnTitle (boardId = "", statusId = "") {
                     autofocus>`;
 }
 
-export function newCardTitle (boardId = "", cardId = "") {
+export function newCardTitle (boardId = "", cardId = "", currentCardTitle="", statusId="") {
     return `<input type="text" 
                     placeholder="${currentCardTitle}" 
                     id="new-card-title-${boardId}"

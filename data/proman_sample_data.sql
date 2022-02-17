@@ -77,6 +77,7 @@ INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 1, 'Márton Magai', 2);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 1, 'Tamás Bosánszki', 3);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 1, '(+Gábor Hajdu)', 4);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'Archive cards', 1, true);
+INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'FUCK GUNICORN!!4NÉGY!!', 7, true);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'History of changes', 2);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'Manual sync', 3);
 INSERT INTO cards VALUES (nextval('cards_id_seq'), 1, 2, 'Live sync', 4);
