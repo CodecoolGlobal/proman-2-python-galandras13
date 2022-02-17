@@ -79,8 +79,8 @@ function boardBuilder (board) {
             </section>`;
 }
 
-function createNewBoardTitle (boardId = '') {
-    boardId = boardId ? `-${boardId}` : "";
+export function createNewBoardTitle (boardId = '') {
+    boardId = boardId ? `-${boardId}` : ""
     return `<input type="text" 
                     placeholder="Board Title" 
                     id="new-board-title${boardId}"
@@ -88,7 +88,7 @@ function createNewBoardTitle (boardId = '') {
            <button id="submit-new-board-title${boardId}">Submit</button>`;
 }
 
-function newColumnTitle (boardId = "", statusId = "") {
+export function newColumnTitle (boardId = "", statusId = "") {
     return `<input type="text" 
                     placeholder="Enter new column title" 
                     id="new-column-title-${statusId}"
@@ -97,7 +97,7 @@ function newColumnTitle (boardId = "", statusId = "") {
                     autofocus>`;
 }
 
-function newCardTitle (boardId = "", cardId = "", currentCardTitle="", statusId="") {
+export function newCardTitle (boardId = "", cardId = "") {
     return `<input type="text" 
                     placeholder="${currentCardTitle}" 
                     id="new-card-title-${boardId}"

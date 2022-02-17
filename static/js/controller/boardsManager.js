@@ -4,6 +4,7 @@ import { domManager } from "../view/domManager.js";
 import { cardsManager } from "./cardsManager.js";
 import { reset } from "../main.js";
 import { historyManager } from "./historyManager.js";
+import { websocketManager } from "./websocketManager.js";
 
 export let boardsManager = {
     loadBoards: async function () {
@@ -25,6 +26,10 @@ export let boardsManager = {
         domManager.addEventListener('#create-new-board', "click", createBoardHandler);
     },
     hideCards: async function (boardId, deleteModals = true) {
+        const cardCopy = document.querySelector('.card-copy');
+        if (cardCopy != null) {
+            cardCopy.remove();
+        }
         const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
         const columnModalChild = document.querySelector(`#AddColumnModal${boardId}`);
         const archivesModalChild = document.querySelector(`#AddArchiveModal${boardId}`);
@@ -159,6 +164,7 @@ async function addCardHandler (clickEvent) {
     await addCardHistoryHandler(createCardInputField, boardId, newCardName);
     await historyManager.showHistory()
     await dataHandler.createNewCard(boardId, newCardName);
+    websocketManager.sendNewCard(boardId, newCardName);
     await boardsManager.refreshBoard(boardId);
 }
 

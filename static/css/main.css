@@ -241,8 +241,13 @@ section.board {
     opacity: 0.5;
 }
 
-.currently-dragged {
+.currently-dragged, .currently-dragged-by-another-user, .card-copy {
     opacity: 0.5;
+}
+
+.card-copy {
+    position: absolute;
+    z-index: 9999;
 }
 
 .board-column {
