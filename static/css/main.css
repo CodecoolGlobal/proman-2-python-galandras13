@@ -87,7 +87,7 @@ section.board {
     /*This only works if the tag is really empty and there is not even whitespace inside*/
     border: 4px solid #cdcdcd;
     margin-top: 4px;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     background: #eee;
 }
 
@@ -241,8 +241,13 @@ section.board {
     opacity: 0.5;
 }
 
-.currently-dragged {
+.currently-dragged, .currently-dragged-by-another-user, .card-copy {
     opacity: 0.5;
+}
+
+.card-copy {
+    position: absolute;
+    z-index: 9999;
 }
 
 .board-column {
@@ -319,4 +324,24 @@ input {
 li {
     width: fit-content;
     max-width: 90%;
+}
+
+.session-history {
+    background-color: #ffffff90;
+    border-radius: var(--border-radius);
+    max-width: 500px;
+    /*height: 200px;*/
+    margin:20px;
+}
+
+.content-container {
+    display: flex;
+    flex-flow: row;
+    justify-content: right;
+}
+
+#root {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
 }

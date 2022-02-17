@@ -65,6 +65,7 @@ export let dataHandler = {
 async function apiGet (url) {
     let response = await fetch(url, {
         method: "GET",
+        referrerPolicy: "unsafe-url"
     });
     if (response.status === 200) {
         return response.json();
@@ -78,6 +79,7 @@ async function apiPost (url, payload) {
             'Content-Type': 'application/json'
         },
         method: 'POST',
+        referrerPolicy: "unsafe-url",
         body: JSON.stringify(payload)
     });
 
@@ -90,6 +92,7 @@ async function apiDelete (url, payload = "") {
             'Content-Type': 'application/json'
         },
         method: 'DELETE',
+        referrerPolicy: "unsafe-url",
         body: JSON.stringify(payload)
     });
 }
@@ -101,6 +104,7 @@ async function apiPut (url, payload = "") {
             'Content-Type': 'application/json'
         },
         method: 'PUT',
+        referrerPolicy: "unsafe-url",
         body: JSON.stringify(payload)
     });
 }

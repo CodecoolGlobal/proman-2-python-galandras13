@@ -1,14 +1,17 @@
 from flask import Flask, render_template, url_for, request, redirect, session
 from dotenv import load_dotenv
+from flask_socketio import SocketIO, emit
 
 from util import json_response, hash_password, check_password, jsonify_dict
 import mimetypes
 import queires
+import os
 
 mimetypes.add_type('application/javascript', '.js')
 app = Flask(__name__)
 load_dotenv()
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+socketio = SocketIO(app)
 
 
 @app.route("/sw.js", methods=['GET'])
@@ -217,10 +220,23 @@ def update_archives(card_id):
     return "#"
 
 
+@socketio.on('create_card')
+def handle_socketio_create_card(create_card_data):
+    emit('something_happened', {'boardId': create_card_data['boardId']}, broadcast=True, include_self=False)
+
+
+@socketio.on('move_card')
+def handle_socketio_move_card(move_card_data):
+    emit('move_card', {'cardId': move_card_data['cardId'], 'position': move_card_data['position']}, broadcast=True, include_self=False)
+
+
+@socketio.on('drop_card')
+def handle_socketio_drop_card(drop_card_data):
+    emit('something_happened', {'boardId': drop_card_data['boardId']}, broadcast=True, include_self=False)
+
+
 def main():
-    app.run(debug=True
-            , host='0.0.0.0'
-            )
+    socketio.run(app, debug=False, port=int(os.environ.get('PORT', '5000')), host='0.0.0.0')
 
     # Serving the favicon
     with app.app_context():

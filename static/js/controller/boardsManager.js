@@ -3,6 +3,8 @@ import { htmlFactory, htmlTemplates } from "../view/htmlFactory.js";
 import { domManager } from "../view/domManager.js";
 import { cardsManager } from "./cardsManager.js";
 import { reset } from "../main.js";
+import { historyManager } from "./historyManager.js";
+import { websocketManager } from "./websocketManager.js";
 
 export let boardsManager = {
     loadBoards: async function () {
@@ -24,6 +26,10 @@ export let boardsManager = {
         domManager.addEventListener('#create-new-board', "click", createBoardHandler);
     },
     hideCards: async function (boardId, deleteModals = true) {
+        const cardCopy = document.querySelector('.card-copy');
+        if (cardCopy != null) {
+            cardCopy.remove();
+        }
         const statusContainer = document.querySelector(`.board-columns[data-board-id="${boardId}"]`);
         const columnModalChild = document.querySelector(`#AddColumnModal${boardId}`);
         const archivesModalChild = document.querySelector(`#AddArchiveModal${boardId}`);
@@ -60,7 +66,7 @@ export let boardsManager = {
         await boardsManager.showColumn(boardId, deleteModals);
         await cardsManager.loadCards(boardId);
         await cardsManager.initDragAndDrop(boardId);
-    }
+    },
 };
 
 async function showHideButtonHandler (clickEvent) {
@@ -145,18 +151,37 @@ async function addCardInput (clickEvent) {
     const createCardButton = document.querySelector(`.board-add-new-card[data-board-id="${boardId}"]`);
     createCardButton.classList.add("hidden");
     domManager.addChild(`.add-card-button-container${boardId}`, createNewCardInputContent);
-    domManager.addEventListener(`#new-card${boardId}`, "click", addCard);
+    domManager.addEventListener(`#new-card${boardId}`, "click", addCardHandler);
     domManager.addEventListener(`#new-card-input-field${boardId}`, "input", checkCreateCardInput);
     domManager.addEventListener(`#new-card-input-field${boardId}`, "click", noClickEvent);
 }
 
-async function addCard (clickEvent) {
+async function addCardHandler (clickEvent) {
     clickEvent.stopPropagation();
     const boardId = clickEvent.target.dataset.boardId;
     const createCardInputField = document.querySelector(`#new-card-input-field${boardId}`);
-    const newCardName = createCardInputField.value;
+    let newCardName = createCardInputField.value;
+    await addCardHistoryHandler(createCardInputField, boardId, newCardName);
+    await historyManager.showHistory()
     await dataHandler.createNewCard(boardId, newCardName);
+    websocketManager.sendNewCard(boardId, newCardName);
     await boardsManager.refreshBoard(boardId);
+}
+
+const addCardHistoryHandler = async (createCardInputField, boardId, newCardName) => {
+    const board = await dataHandler.getBoard(boardId);
+    const sessionStorageCreateCardContent = { 'cardName': newCardName, 'boardName': board.title };
+
+    if (sessionStorage.getItem("0-historyIndex")) {
+        let historyLength = +sessionStorage.getItem("0-historyIndex") + 1;
+        sessionStorage.setItem("0-historyIndex", `${historyLength}`);
+    } else {
+        sessionStorage.setItem("0-historyIndex", "1")
+    }
+
+    sessionStorage.setItem(`${sessionStorage.getItem("0-historyIndex")}-newCard`, JSON.stringify(sessionStorageCreateCardContent));
+    let historyLength = sessionStorage.getItem("0-historyIndex");
+    sessionStorage.setItem("0-historyIndex", `${historyLength}`);
 }
 
 async function addColumn (clickEvent) {

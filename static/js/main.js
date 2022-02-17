@@ -1,8 +1,12 @@
 import { boardsManager } from "./controller/boardsManager.js";
+import { websocketManager } from "./controller/websocketManager.js";
+import { historyManager } from "./controller/historyManager.js";
 
-function init () {
-    boardsManager.loadBoards();
-    boardsManager.createBoard();
+async function init () {
+    await boardsManager.loadBoards();
+    await boardsManager.createBoard();
+    await historyManager.showHistory();
+    websocketManager.init();
 }
 
 export async function reset () {
@@ -11,7 +15,7 @@ export async function reset () {
     await init();
 }
 
-init();
+await init();
 
 let boardIds = [];
 let cardURLs = [];

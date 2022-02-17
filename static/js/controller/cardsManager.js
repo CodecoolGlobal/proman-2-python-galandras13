@@ -2,6 +2,8 @@ import { dataHandler } from "../data/dataHandler.js";
 import { htmlFactory, htmlTemplates } from "../view/htmlFactory.js";
 import { domManager } from "../view/domManager.js";
 import { boardsManager, noClickEvent } from "./boardsManager.js";
+import { historyManager } from "./historyManager.js";
+import { websocketManager } from "./websocketManager.js";
 
 const ui = {
     slots: null,
@@ -21,7 +23,7 @@ export let cardsManager = {
                 const cardBuilder = htmlFactory(htmlTemplates.card);
                 const content = cardBuilder(card);
                 domManager.addChild(`.board-column-content[data-status-id="${card.status_id}"][data-board-id="${boardId}"]`, content);
-                domManager.addEventListener(`.card-remove[data-card-id="${card.id}"]`, "click", deleteButtonHandler);
+                domManager.addEventListener(`.card-remove[data-card-id="${card.id}"]`, "click", deleteCardHandler);
                 domManager.addEventListener(`.cardName[data-card-id="${card.id}"][data-board-id="${card.board_id}"]`, "click", renameCard);
                 domManager.addEventListener(`.archive-add[data-card-id="${card.id}"]`, "click", addToArchiveHandler);
             } else {
@@ -32,16 +34,35 @@ export let cardsManager = {
     }, initDragAndDrop: async function (boardId) {
         await initElements(boardId);
         await initDragEvents();
+    },
+    showCurrentlyDraggedCard (cardId, position) {
+        const card = document.querySelector(`[data-card-id="${cardId}"]`);
+        card.classList.add('currently-dragged-by-another-user');
+        cardsManager.copyCard(card, position);
+    },
+    copyCard (card, position) {
+        let cardCopy = document.querySelector(`.card-copy[data-card-id="${card.dataset.cardId}"]`);
+        if (cardCopy == null) {
+            const copyOfCardHtml = `<div class="card hidden card-copy" data-card-id="${card.dataset.cardId}">${card.innerHTML}</div>`;
+            document.body.insertAdjacentHTML('afterbegin', copyOfCardHtml);
+            cardCopy = document.querySelector(`.card-copy[data-card-id="${card.dataset.cardId}"]`);
+        }
+
+        cardCopy.style.left = `${position.x + 48}px`;
+        cardCopy.style.top = `${position.y - 16}px`;
+        cardCopy.classList.remove('hidden');
     }
 };
 
 async function renameCard (clickEvent) {
     const cardId = clickEvent.target.dataset.cardId;
     const boardId = clickEvent.target.dataset.boardId;
+    const statusId = clickEvent.target.dataset.statusId;
     const renameCardCurrentName = document.querySelector(`.card-title[data-card-id="${cardId}"]`);
     renameCardCurrentName.classList.add("hidden");
+    const currentCardTitle = clickEvent.target.innerText;
     const newCardTitle = htmlFactory(htmlTemplates.newCardTitle);
-    const renameCardContent = newCardTitle(boardId, cardId);
+    const renameCardContent = newCardTitle(boardId, cardId, currentCardTitle, statusId);
     domManager.addChildAfterBegin(`.card[data-card-id="${cardId}"]`, renameCardContent);
     domManager.addEventListener(`#new-card-title-${boardId}`, "keydown", keyDownOnRenameCard);
     domManager.addEventListener(`#new-card-title-${boardId}`, "click", noClickEvent);
@@ -52,9 +73,13 @@ async function renameCard (clickEvent) {
 async function keyDownOnRenameCard (e) {
     const cardId = e.target.dataset.cardId;
     const boardId = e.target.dataset.boardId;
+    const statusId = e.target.dataset.statusId;
     if (e.key === 'Enter') {
         if (e.target.value) {
+            const previousTitle = e.target.placeholder;
             const modifiedTitle = document.querySelector(`#new-card-title-${boardId}`).value;
+            await renameHistoryHandler(statusId, modifiedTitle, previousTitle);
+            await historyManager.showHistory()
             await dataHandler.renameCard(cardId, modifiedTitle);
             await boardsManager.refreshBoard(boardId);
         }
@@ -64,6 +89,26 @@ async function keyDownOnRenameCard (e) {
         inputField.parentElement.removeChild(inputField);
         currentCardName.classList.remove("hidden");
     }
+}
+
+const renameHistoryHandler = async (statusId, modifiedTitle, previousTitle) => {
+    const status = await dataHandler.getStatus(statusId);
+    const sessionStorageModifyCardContent = {
+        'cardName': modifiedTitle,
+        'previousTitle': previousTitle,
+        'statusName': status.title
+    };
+
+    if (sessionStorage.getItem("0-historyIndex")) {
+        let historyLength = +sessionStorage.getItem("0-historyIndex") + 1;
+        sessionStorage.setItem("0-historyIndex", `${historyLength}`);
+    } else {
+        sessionStorage.setItem("0-historyIndex", "1")
+    }
+
+    sessionStorage.setItem(`${sessionStorage.getItem("0-historyIndex")}-updateCard`, JSON.stringify(sessionStorageModifyCardContent));
+    let historyLength = sessionStorage.getItem("0-historyIndex");
+    sessionStorage.setItem("0-historyIndex", `${historyLength}`);
 }
 
 async function cancelNameChange (e) {
@@ -85,14 +130,34 @@ function sortByCardOrder (a, b) {
     return 0;
 }
 
-async function deleteButtonHandler (clickEvent) {
+async function deleteCardHandler (clickEvent) {
     const boardId = clickEvent.currentTarget.dataset.boardId;
     const cardId = clickEvent.currentTarget.dataset.cardId;
+    const cardName = clickEvent.currentTarget.dataset.cardTitle;
+    await deleteCardHistoryHandler(cardName, boardId);
+    await historyManager.showHistory()
     await dataHandler.deleteCard(cardId);
     await boardsManager.hideCards(boardId);
     await boardsManager.showColumn(boardId);
     await cardsManager.loadCards(boardId);
     await cardsManager.initDragAndDrop(boardId);
+}
+
+const deleteCardHistoryHandler = async (cardName, boardId) => {
+
+    const board = await dataHandler.getBoard(boardId);
+    const sessionStorageModifyCardContent = { 'cardName': cardName, 'boardName': board.title };
+
+    if (sessionStorage.getItem("0-historyIndex")) {
+        let historyLength = +sessionStorage.getItem("0-historyIndex") + 1;
+        sessionStorage.setItem("0-historyIndex", `${historyLength}`);
+    } else {
+        sessionStorage.setItem("0-historyIndex", "1")
+    }
+
+    sessionStorage.setItem(`${sessionStorage.getItem("0-historyIndex")}-deleteCard`, JSON.stringify(sessionStorageModifyCardContent));
+    let historyLength = sessionStorage.getItem("0-historyIndex");
+    sessionStorage.setItem("0-historyIndex", `${historyLength}`);
 }
 
 let addToArchiveHandler = async (event) => {
@@ -127,6 +192,7 @@ function initDragEvents () {
 function initDraggable (draggable) {
     draggable.addEventListener("dragstart", handleDragStart);
     draggable.addEventListener("dragend", handleDragEnd);
+    document.addEventListener("drag", handleDrag, false);
 }
 
 function initDropzone (dropzone) {
@@ -156,10 +222,17 @@ async function handleDragEnd () {
                 'card_order': cardOrder,
                 'status_id': statusId
             };
+
+            card.children[0].children[0].setAttribute(`data-status-id`, `${statusId}`);
             await dataHandler.updateCards(payload);
         }
     }
+    websocketManager.sendCardDropped(boardId);
     game.dragged = null;
+}
+
+function handleDrag (e) {
+    websocketManager.sendCardPosition(e.target.dataset.cardId, { x: e.clientX, y: e.clientY })
 }
 
 function handleDragEnter (e) {
