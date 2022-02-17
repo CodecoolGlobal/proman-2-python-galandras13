@@ -74,12 +74,10 @@ async function keyDownOnRenameCard (e) {
     const cardId = e.target.dataset.cardId;
     const boardId = e.target.dataset.boardId;
     const statusId = e.target.dataset.statusId;
-    console.log(e.target);
     if (e.key === 'Enter') {
         if (e.target.value) {
             const previousTitle = e.target.placeholder;
             const modifiedTitle = document.querySelector(`#new-card-title-${boardId}`).value;
-            console.log(statusId);
             await renameHistoryHandler(statusId, modifiedTitle, previousTitle);
             await historyManager.showHistory()
             await dataHandler.renameCard(cardId, modifiedTitle);
