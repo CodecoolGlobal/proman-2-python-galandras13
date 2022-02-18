@@ -31,11 +31,13 @@
           integrity="sha384-u5J7JghGz0qUrmEsWzBQkfvc8nK3fUT7DCaQzNQ+q4oEXhGSx+P2OqjWsfIRB8QT" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+
+    <link rel="manifest" href="../static/manifest.json">
 </head>
 <body>
 <div class="navbar-container">
     <nav class="navMenu">
-        <img class="image" src="{{ url_for('static', filename='/img/codecool-logo.png') }}" alt="logo"
+        <img class="image" src="{{ url_for('static', filename='img/codecool-logo.png') }}" alt="logo"
              draggable="false">
         {% if not session.username %}
             <a id="registration" href="/registration">Register</a>

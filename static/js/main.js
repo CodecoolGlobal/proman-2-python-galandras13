@@ -15,4 +15,19 @@ export async function reset () {
     await init();
 }
 
+const registerSW = () => {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('../sw.js').then(function () {
+                return navigator.serviceWorker.ready;
+            }).then(function (registration) {
+                console.log('Registration successful, scope is:', registration.scope);
+            }).catch(function (error) {
+                console.error('Service worker registration failed, error:', error);
+            });
+        });
+    }
+}
+
+registerSW();
 await init();
