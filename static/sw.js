@@ -1,62 +1,3 @@
-// // importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.2.0/workbox-sw.js');
-//
-// const CACHE_NAME = 'home-page-cache';
-// let urlsToCache = [
-//     '/',
-//     '/index',
-//     '/registration',
-//     '/static/css/main.css',
-//     '/static/manifest.json',
-//     '/static/js/controller/boardsManager.js',
-//     '/static/img/codecool-logo.png',
-//     '/static/js/data/dataHandler.js',
-//     '/static/js/view/htmlFactory.js',
-//     '/static/js/view/domManager.js',
-//     '/static/js/controller/cardsManager.js',
-//     '/static/js/main.js',
-//     '/api/boards',
-//     '/api/statuses/',
-//     // `/api/boards/${boardId}/cards/`,
-//     // 'https://use.fontawesome.com/releases/v5.5.0/webfonts/fa-solid-900.woff2',
-//     '/static/favicon/favicon.ico',
-//     '/static/favicon/favicon-32x32.png',
-//     '/api/boards/1/cards/',
-//     '/api/boards/2/cards/'
-// ];
-//
-// // let data = '';
-// // self.addEventListener('message', function (event) {
-// //     data = JSON.parse(event.data);
-// //     // console.log(urlsToCache);
-// //     urlsToCache = [urlsToCache, ...data];
-// //     console.log(urlsToCache);
-// // });
-//
-// self.addEventListener('install', function(e) {
-//  e.waitUntil(
-//    caches.open(CACHE_NAME).then(function(cache) {
-//      return cache.addAll(urlsToCache);
-//    })
-//  );
-//  self.skipWaiting();
-// });
-//
-// self.addEventListener('fetch', async function(event) {
-//  console.log(event.request.url);
-//
-//  caches.open(CACHE_NAME).then(function(cache) {
-//      return cache.add(event.request.url);
-//  });
-//
-//  event.respondWith(
-//    caches.match(event.request).then(async function(response) {
-//        // console.log(event.request);
-//        // console.log(caches.keys());
-//        return response || await fetch(event.request);
-//    })
-//  );
-// });
-
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js');
 
 workbox.skipWaiting();
@@ -97,13 +38,9 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
-    new RegExp('/'),
+    new RegExp('https://proman-blonde-elephants.herokuapp.com/'),
     workbox.strategies.networkFirst({
         cacheName: 'ProMan-cache-main-page'
-        // ,
-        // cacheExpiration: {
-        //     maxAgeSeconds: 60 * 30 //cache the news content for 30mn
-        // }
     })
 );
 
@@ -148,13 +85,6 @@ workbox.routing.registerRoute(
         cacheName: 'bs-js'
     })
 );
-
-// workbox.routing.registerRoute(
-//     new RegExp('(http|https)://cdn.backgroundhost.com/backgrounds/subtlepatterns/diagonal-noise.png'),
-//     workbox.strategies.networkFirst({
-//         cacheName: 'background-png'
-//     })
-// );
 
 workbox.routing.registerRoute(
     new RegExp('https://use.fontawesome.com/releases/v5.5.0/webfonts/'),
