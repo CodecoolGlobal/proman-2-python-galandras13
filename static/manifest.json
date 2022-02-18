@@ -1,7 +1,7 @@
 {
   "name": "proMan",
   "short_name": "proMan",
-  "start_url": "/",
+  "start_url": "https://proman-blonde-elephants.herokuapp.com",
   "icons": [
     {
       "src": "favicon/favicon-16x16.png",
